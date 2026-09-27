@@ -1,206 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Queue Registration</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --primary:#0F4C81;--primary-dark:#0a3560;--accent:#00B4D8;
-  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
-  --text:#1a2332;--text-muted:#6b7a8d;--border:#e2e8f0;
-}
-body{
-  font-family:'Inter',sans-serif;
-  background:linear-gradient(135deg,#0F4C81 0%,#00B4D8 100%);
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  padding:20px;
-}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--primary:#0F4C81;--accent:#00B4D8;--success:#16a34a;--danger:#dc2626;--warning:#d97706;}
+  body{font-family:'Inter',sans-serif;min-height:100vh;background:linear-gradient(135deg,#0F4C81 0%,#00B4D8 100%);display:flex;align-items:center;justify-content:center;padding:1rem;}
 
-/* PIN SCREEN */
-#pinScreen{width:100%;max-width:400px;}
-.pin-card{
-  background:#fff;border-radius:20px;padding:40px 32px;text-align:center;
-  box-shadow:0 20px 60px rgba(0,0,0,0.25);
-}
-.pin-logo{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--primary);margin-bottom:6px;}
-.pin-sub{color:var(--text-muted);font-size:14px;margin-bottom:28px;}
-.pin-input{
-  width:100%;text-align:center;font-size:28px;letter-spacing:10px;font-weight:700;
-  padding:14px;border:2px solid var(--border);border-radius:12px;
-  font-family:'Space Grotesk',sans-serif;outline:none;margin-bottom:16px;
-  transition:border-color .2s;
-}
-.pin-input:focus{border-color:var(--primary);}
-.pin-btn{
-  width:100%;padding:14px;background:var(--primary);color:#fff;border:none;
-  border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:background .2s;
-}
-.pin-btn:hover{background:var(--primary-dark);}
-.pin-error{color:var(--danger);font-size:13px;margin-top:10px;display:none;}
+  /* ── SCREENS ── */
+  .screen{display:none;width:100%;max-width:480px;}
+  .screen.active{display:block;}
 
-/* MAIN CARD */
-#mainCard{display:none;width:100%;max-width:520px;}
-.card{
-  background:#fff;border-radius:20px;overflow:hidden;
-  box-shadow:0 20px 60px rgba(0,0,0,0.25);
-}
-.card-header{
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  padding:28px 32px;color:#fff;
-}
-.card-header-title{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;}
-.card-header-sub{font-size:13px;opacity:.85;margin-top:4px;}
-.queue-stats{
-  display:flex;gap:0;border-bottom:1px solid var(--border);
-}
-.queue-stat{
-  flex:1;padding:16px;text-align:center;border-right:1px solid var(--border);
-}
-.queue-stat:last-child{border-right:none;}
-.queue-stat-value{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:var(--primary);}
-.queue-stat-label{font-size:11px;color:var(--text-muted);font-weight:500;margin-top:2px;}
-.card-body{padding:28px 32px;}
+  /* ── CARD ── */
+  .card{background:#fff;border-radius:20px;box-shadow:0 25px 60px rgba(0,0,0,0.2);overflow:hidden;}
+  .card-header{background:linear-gradient(135deg,#0F4C81,#00B4D8);padding:1.75rem 1.5rem;color:#fff;text-align:center;}
+  .card-header h1{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;}
+  .card-header p{font-size:0.85rem;opacity:0.85;margin-top:0.25rem;}
+  .card-body{padding:1.75rem 1.5rem;}
 
-/* FORM */
-.form-group{margin-bottom:18px;}
-.form-label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text);}
-.form-label .req{color:var(--danger);}
-.form-control{
-  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;
-  font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;
-  color:var(--text);
-}
-.form-control:focus{border-color:var(--primary);}
-.input-icon-wrap{position:relative;}
-.input-icon-wrap .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;}
-.input-icon-wrap .form-control{padding-left:40px;}
-.submit-btn{
-  width:100%;padding:15px;background:var(--primary);color:#fff;border:none;
-  border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;
-  transition:background .2s;font-family:'Inter',sans-serif;margin-top:8px;
-}
-.submit-btn:hover{background:var(--primary-dark);}
-.submit-btn:disabled{background:#94a3b8;cursor:not-allowed;}
+  /* ── STATS BAR ── */
+  .stats-bar{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.5rem;}
+  .stat-box{background:#f0f4f8;border-radius:10px;padding:0.85rem;text-align:center;}
+  .stat-box .val{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;color:var(--primary);}
+  .stat-box .lbl{font-size:0.75rem;color:#64748b;margin-top:0.15rem;}
 
-/* TICKET / SUCCESS STATE */
-#ticketState{display:none;padding:32px;text-align:center;}
-.ticket-icon{font-size:56px;margin-bottom:16px;}
-.ticket-number{
-  font-family:'Space Grotesk',sans-serif;font-size:72px;font-weight:700;
-  color:var(--primary);line-height:1;margin-bottom:8px;
-}
-.ticket-label{font-size:14px;color:var(--text-muted);margin-bottom:24px;}
-.position-box{
-  background:linear-gradient(135deg,#f0f9ff,#e0f2fe);
-  border:1.5px solid #bae6fd;border-radius:14px;padding:20px;margin-bottom:20px;
-}
-.position-value{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:700;color:var(--accent);}
-.position-label{font-size:13px;color:var(--text-muted);margin-top:4px;}
-.serving-box{
-  background:linear-gradient(135deg,#f0fdf4,#dcfce7);
-  border:1.5px solid #86efac;border-radius:14px;padding:16px;margin-bottom:20px;
-}
-.serving-value{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:var(--success);}
-.serving-label{font-size:13px;color:var(--text-muted);margin-top:2px;}
-.now-serving-alert{
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  color:#fff;border-radius:14px;padding:20px;margin-bottom:20px;
-  animation:pulse 1.5s infinite;
-}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.85;}}
-.now-serving-text{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;}
-.register-another{
-  background:transparent;border:1.5px solid var(--border);color:var(--text);
-  padding:11px 24px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;
-  font-family:'Inter',sans-serif;transition:all .2s;margin-top:8px;
-}
-.register-another:hover{border-color:var(--primary);color:var(--primary);}
+  /* ── FORM ── */
+  .form-group{margin-bottom:1.1rem;}
+  .form-label{display:block;font-size:0.85rem;font-weight:600;color:#374151;margin-bottom:0.4rem;}
+  .form-input{width:100%;padding:0.75rem 1rem;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.95rem;outline:none;transition:border 0.2s;font-family:'Inter',sans-serif;}
+  .form-input:focus{border-color:var(--primary);}
+  .input-icon{position:relative;}
+  .input-icon .icon{position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);font-size:1rem;}
+  .input-icon .form-input{padding-left:2.5rem;}
 
-.footer-note{text-align:center;color:rgba(255,255,255,0.7);font-size:12px;margin-top:16px;}
+  /* ── BUTTONS ── */
+  .btn{width:100%;padding:0.9rem;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;}
+  .btn-primary{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;}
+  .btn-primary:hover{opacity:0.9;transform:translateY(-1px);}
+  .btn-outline{background:transparent;border:2px solid var(--primary);color:var(--primary);margin-top:0.75rem;}
+
+  /* ── PIN SCREEN ── */
+  .pin-title{text-align:center;margin-bottom:1.5rem;}
+  .pin-title h2{font-family:'Space Grotesk',sans-serif;color:var(--primary);font-size:1.3rem;}
+  .pin-title p{color:#64748b;font-size:0.875rem;margin-top:0.35rem;}
+  .pin-dots{display:flex;justify-content:center;gap:0.75rem;margin-bottom:1.5rem;}
+  .pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid #cbd5e1;background:transparent;transition:all 0.2s;}
+  .pin-dot.filled{background:var(--primary);border-color:var(--primary);}
+  .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;}
+  .pin-btn{padding:1rem;border:1.5px solid #e2e8f0;border-radius:12px;background:#f8fafc;font-size:1.2rem;font-weight:700;cursor:pointer;transition:all 0.15s;font-family:'Space Grotesk',sans-serif;color:var(--primary);}
+  .pin-btn:hover{background:#e2e8f0;}
+  .pin-btn:active{transform:scale(0.95);}
+  .pin-error{color:var(--danger);text-align:center;font-size:0.85rem;margin-top:0.75rem;display:none;}
+
+  /* ── TICKET SCREEN ── */
+  .ticket-card{text-align:center;padding:1rem 0;}
+  .ticket-number{font-family:'Space Grotesk',sans-serif;font-size:5rem;font-weight:700;color:var(--primary);line-height:1;}
+  .ticket-label{font-size:0.85rem;color:#64748b;margin-top:0.25rem;text-transform:uppercase;letter-spacing:0.08em;}
+  .ticket-name{font-size:1.1rem;font-weight:600;color:#1e293b;margin-top:0.75rem;}
+  .position-box{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1.5px solid #bae6fd;border-radius:12px;padding:1rem;margin:1.25rem 0;text-align:center;}
+  .position-box .pos-num{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;color:var(--primary);}
+  .position-box .pos-lbl{font-size:0.8rem;color:#0369a1;margin-top:0.15rem;}
+  .status-box{border-radius:10px;padding:0.75rem;text-align:center;font-weight:600;font-size:0.9rem;margin-bottom:1rem;}
+  .status-waiting{background:#fef3c7;color:#92400e;}
+  .status-serving{background:#dbeafe;color:#1e40af;}
+  .status-called{background:#ede9fe;color:#5b21b6;}
+  .status-completed{background:#dcfce7;color:#166534;}
+
+  /* ── ALERT BANNER ── */
+  .alert-banner{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-radius:12px;padding:1rem;text-align:center;margin-bottom:1rem;animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.8;}}
+  .alert-banner h3{font-size:1.1rem;font-weight:700;}
+  .alert-banner p{font-size:0.85rem;opacity:0.9;margin-top:0.25rem;}
+
+  /* ── CLOSED SCREEN ── */
+  .closed-card{text-align:center;padding:1rem 0;}
+  .closed-icon{font-size:4rem;margin-bottom:1rem;}
+  .closed-card h2{font-family:'Space Grotesk',sans-serif;color:var(--primary);font-size:1.4rem;margin-bottom:0.75rem;}
+  .closed-card p{color:#64748b;font-size:0.95rem;line-height:1.6;}
+  .closed-note{margin-top:1.5rem;padding:1rem;background:#f1f5f9;border-radius:10px;font-size:0.85rem;color:#475569;}
+
+  /* ── CHART ── */
+  .chart-wrap{margin-top:1.25rem;}
+  .chart-wrap h4{font-size:0.85rem;font-weight:600;color:#374151;margin-bottom:0.5rem;text-align:center;}
+  canvas{max-width:100%;}
 </style>
 </head>
 <body>
 
-<!-- PIN SCREEN -->
-<div id="pinScreen">
-  <div class="pin-card">
-    <div class="pin-logo">🎫 Queue Registration</div>
-    <div class="pin-sub">Please enter the access PIN to continue</div>
-    <input type="password" class="pin-input" id="pinInput" maxlength="10" placeholder="••••" onkeydown="if(event.key==='Enter')checkPin()"/>
-    <button class="pin-btn" onclick="checkPin()">Enter</button>
-    <div class="pin-error" id="pinError">❌ Incorrect PIN. Please try again.</div>
-  </div>
-</div>
-
-<!-- MAIN REGISTRATION CARD -->
-<div id="mainCard">
+<!-- CLOSED SCREEN -->
+<div class="screen active" id="screen-closed" style="display:none;">
   <div class="card">
     <div class="card-header">
-      <div class="card-header-title" id="orgTitle">🏛️ Queue Registration</div>
-      <div class="card-header-sub">Please fill in your details to join the queue</div>
+      <h1>Queue Registration</h1>
+      <p>Visitor Self-Registration</p>
     </div>
-    <div class="queue-stats">
-      <div class="queue-stat">
-        <div class="queue-stat-value" id="statWaiting">0</div>
-        <div class="queue-stat-label">Waiting</div>
+    <div class="card-body">
+      <div class="closed-card">
+        <div class="closed-icon">🔴</div>
+        <h2>Registration Closed</h2>
+        <p>Visitor registration is currently unavailable.<br>Please check back during operating hours or approach the counter directly.</p>
+        <div class="closed-note">Thank you for your patience.</div>
       </div>
-      <div class="queue-stat">
-        <div class="queue-stat-value" id="statServing">—</div>
-        <div class="queue-stat-label">Now Serving</div>
-      </div>
-      <div class="queue-stat">
-        <div class="queue-stat-value" id="statDone">0</div>
-        <div class="queue-stat-label">Served Today</div>
-      </div>
-    </div>
-
-    <!-- FORM STATE -->
-    <div class="card-body" id="formState">
-      <div class="form-group">
-        <label class="form-label">Full Name <span class="req">*</span></label>
-        <div class="input-icon-wrap">
-          <span class="icon">👤</span>
-          <input type="text" class="form-control" id="visitorName" placeholder="Enter your full name"/>
-        </div>
-      </div>
-      <div id="dynamicFormFields"></div>
-      <button class="submit-btn" id="submitBtn" onclick="submitRegistration()">🎫 Join Queue</button>
-    </div>
-
-    <!-- TICKET STATE -->
-    <div id="ticketState">
-      <div class="ticket-icon">🎫</div>
-      <div class="ticket-number" id="ticketNumber">A001</div>
-      <div class="ticket-label">Your Queue Ticket</div>
-
-      <div id="nowServingAlert" class="now-serving-alert" style="display:none;">
-        <div class="now-serving-text">🔔 It's Your Turn!</div>
-        <div style="font-size:13px;opacity:.9;margin-top:4px;">Please proceed to the counter now.</div>
-      </div>
-
-      <div class="position-box" id="positionBox">
-        <div class="position-value" id="positionValue">—</div>
-        <div class="position-label">People ahead of you</div>
-      </div>
-
-      <div class="serving-box">
-        <div class="serving-value" id="currentlyServing">—</div>
-        <div class="serving-label">Currently being served</div>
-      </div>
-
-      <button class="register-another" onclick="resetForm()">+ Register Another Person</button>
     </div>
   </div>
-  <div class="footer-note">Your position updates automatically in real-time</div>
 </div>
 
-<!-- FIREBASE -->
+<!-- PIN SCREEN -->
+<div class="screen" id="screen-pin">
+  <div class="card">
+    <div class="card-header">
+      <h1>Queue Registration</h1>
+      <p>Visitor Self-Registration</p>
+    </div>
+    <div class="card-body">
+      <div class="pin-title">
+        <h2>🔐 Enter PIN</h2>
+        <p>Please enter the 4-digit visitor PIN to continue.</p>
+      </div>
+      <div class="pin-dots">
+        <div class="pin-dot" id="dot-0"></div>
+        <div class="pin-dot" id="dot-1"></div>
+        <div class="pin-dot" id="dot-2"></div>
+        <div class="pin-dot" id="dot-3"></div>
+      </div>
+      <div class="pin-pad">
+        <button class="pin-btn" onclick="pinPress('1')">1</button>
+        <button class="pin-btn" onclick="pinPress('2')">2</button>
+        <button class="pin-btn" onclick="pinPress('3')">3</button>
+        <button class="pin-btn" onclick="pinPress('4')">4</button>
+        <button class="pin-btn" onclick="pinPress('5')">5</button>
+        <button class="pin-btn" onclick="pinPress('6')">6</button>
+        <button class="pin-btn" onclick="pinPress('7')">7</button>
+        <button class="pin-btn" onclick="pinPress('8')">8</button>
+        <button class="pin-btn" onclick="pinPress('9')">9</button>
+        <button class="pin-btn" onclick="pinPress('clear')" style="font-size:0.85rem;color:#dc2626;">CLR</button>
+        <button class="pin-btn" onclick="pinPress('0')">0</button>
+        <button class="pin-btn" onclick="pinPress('back')" style="font-size:1rem;">⌫</button>
+      </div>
+      <div class="pin-error" id="pin-error">Incorrect PIN. Please try again.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM SCREEN -->
+<div class="screen" id="screen-form">
+  <div class="card">
+    <div class="card-header">
+      <h1>Queue Registration</h1>
+      <p>Fill in your details to join the queue</p>
+    </div>
+    <div class="card-body">
+      <div class="stats-bar">
+        <div class="stat-box">
+          <div class="val" id="stat-queue">0</div>
+          <div class="lbl">In Queue</div>
+        </div>
+        <div class="stat-box">
+          <div class="val" id="stat-wait">~0</div>
+          <div class="lbl">Est. Wait (min)</div>
+        </div>
+      </div>
+      <div id="dynamic-form"></div>
+      <button class="btn btn-primary" onclick="submitForm()">🎫 Join Queue</button>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET SCREEN -->
+<div class="screen" id="screen-ticket">
+  <div class="card">
+    <div class="card-header">
+      <h1>Your Queue Ticket</h1>
+      <p id="ticket-org">Queue Management System</p>
+    </div>
+    <div class="card-body">
+      <div id="alert-banner" style="display:none;" class="alert-banner">
+        <h3>📢 Your number is being called!</h3>
+        <p>Please proceed to the counter now.</p>
+      </div>
+      <div class="ticket-card">
+        <div class="ticket-label">Ticket Number</div>
+        <div class="ticket-number" id="ticket-num">—</div>
+        <div class="ticket-name" id="ticket-name">—</div>
+      </div>
+      <div class="status-box status-waiting" id="ticket-status-box">⏳ Waiting</div>
+      <div class="position-box">
+        <div class="pos-num" id="ticket-position">—</div>
+        <div class="pos-lbl">Position in Queue</div>
+      </div>
+      <div class="chart-wrap">
+        <h4>📊 Current Queue Volume</h4>
+        <canvas id="volume-chart" height="120"></canvas>
+      </div>
+      <button class="btn btn-outline" onclick="leaveQueue()">Leave Queue</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get, push, set, onValue, runTransaction, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDLBoDG92_PIsCY5wyf4lDEdDJrkKtg2YA",
@@ -209,171 +214,310 @@ const firebaseConfig = {
   projectId: "queue-management-system-4a943",
   storageBucket: "queue-management-system-4a943.firebasestorage.app",
   messagingSenderId: "339444348789",
-  appId: "1:339444348789:web:e325425ef7333dc9c7053c",
-  measurementId: "G-W8EP43RHY0"
+  appId: "1:339444348789:web:e325425ef7333dc9c7053c"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let settings = { visitorPin:'1234', orgName:'', queuePrefix:'A' };
+// ── STATE ──
+let visitorPin = "1234";
+let pinEntry = "";
+let myTicketNumber = null;
+let myQueueKey = null;
+let myName = "";
 let formQuestions = [];
 let queueData = {};
-let historyData = {};
-let myTicket = null;
-let myEntryId = null;
+let volumeChart = null;
+let lastAlertTime = 0;
 
-get(ref(db,'settings')).then(snap=>{
-  if(snap.exists()){
-    const s = snap.val();
-    settings = {...settings,...s};
-    if(s.orgName) document.getElementById('orgTitle').textContent = '🏛️ '+s.orgName;
-  }
-});
-
-onValue(ref(db,'queue'), snap=>{
-  queueData = snap.exists() ? snap.val() : {};
-  updateStats();
-  if(myTicket) updateMyPosition();
-});
-
-onValue(ref(db,'history'), snap=>{
-  historyData = snap.exists() ? snap.val() : {};
-  updateStats();
-});
-
-onValue(ref(db,'formQuestions'), snap=>{
-  formQuestions = snap.exists() ? Object.entries(snap.val()).map(([id,v])=>({id,...v})) : [];
-  renderDynamicForm();
-});
-
-onValue(ref(db,'settings'), snap=>{
-  if(snap.exists()){
-    const s = snap.val();
-    settings = {...settings,...s};
-    if(s.orgName) document.getElementById('orgTitle').textContent = '🏛️ '+s.orgName;
-  }
-});
-
-function isToday(ts){
-  if(!ts) return false;
-  const d=new Date(ts),n=new Date();
-  return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();
-}
-
-function updateStats(){
-  const entries = Object.values(queueData);
-  const waiting = entries.filter(e=>e.status==='waiting').length;
-  const serving = entries.find(e=>e.status==='serving');
-  const doneToday = Object.values(historyData).filter(e=>e.status==='done'&&isToday(e.timestamp)).length;
-  document.getElementById('statWaiting').textContent = waiting;
-  document.getElementById('statServing').textContent = serving ? serving.ticket : '—';
-  document.getElementById('statDone').textContent = doneToday;
-}
-
-window.checkPin = function(){
-  const entered = document.getElementById('pinInput').value;
-  if(entered === settings.visitorPin){
-    document.getElementById('pinScreen').style.display='none';
-    document.getElementById('mainCard').style.display='block';
-  } else {
-    document.getElementById('pinError').style.display='block';
-    document.getElementById('pinInput').value='';
-  }
-};
-
-function renderDynamicForm(){
-  const container = document.getElementById('dynamicFormFields');
-  if(!formQuestions.length){ container.innerHTML=''; return; }
-  container.innerHTML = formQuestions.map(q=>{
-    const req = q.required==='true'||q.required===true;
-    let input = '';
-    if(q.type==='text') input=`<input type="text" class="form-control" id="fq_${q.id}" placeholder="Enter your answer"/>`;
-    else if(q.type==='number') input=`<input type="number" class="form-control" id="fq_${q.id}" placeholder="Enter number"/>`;
-    else if(q.type==='yesno') input=`<select class="form-control" id="fq_${q.id}"><option value="">Select</option><option>Yes</option><option>No</option></select>`;
-    else if(q.type==='dropdown'){
-      const opts = (q.options||'').split('\n').filter(Boolean);
-      input=`<select class="form-control" id="fq_${q.id}"><option value="">Select an option</option>${opts.map(o=>`<option>${o}</option>`).join('')}</select>`;
-    }
-    return `<div class="form-group">
-      <label class="form-label">${q.text}${req?'<span class="req"> *</span>':''}</label>
-      ${input}
-    </div>`;
-  }).join('');
-}
-
-window.submitRegistration = async function(){
-  const name = document.getElementById('visitorName').value.trim();
-  if(!name){ alert('Please enter your full name.'); return; }
-  for(const q of formQuestions){
-    const req = q.required==='true'||q.required===true;
-    if(req){
-      const val = document.getElementById('fq_'+q.id)?.value||'';
-      if(!val){ alert('Please answer: '+q.text); return; }
-    }
-  }
-  const btn = document.getElementById('submitBtn');
-  btn.disabled=true; btn.textContent='Joining queue...';
+// ── AUDIO ── (Web Audio API — no file needed)
+function createAlertSound() {
   try {
-    const snap = await get(ref(db,'ticketCounter'));
-    const count = (snap.exists()?snap.val():0)+1;
-    await set(ref(db,'ticketCounter'),count);
-    const prefix = settings.queuePrefix||'A';
-    const ticket = prefix+String(count).padStart(3,'0');
-    const answers = {};
-    formQuestions.forEach(q=>{ answers[q.id]=document.getElementById('fq_'+q.id)?.value||''; });
-    const newRef = push(ref(db,'queue'));
-    await set(newRef,{name,ticket,status:'waiting',timestamp:Date.now(),answers});
-    myTicket = ticket;
-    myEntryId = newRef.key;
-    document.getElementById('formState').style.display='none';
-    document.getElementById('ticketState').style.display='block';
-    document.getElementById('ticketNumber').textContent = ticket;
-    updateMyPosition();
-  } catch(err){
-    alert('Error joining queue. Please try again.');
-    btn.disabled=false; btn.textContent='🎫 Join Queue';
-  }
-};
-
-function updateMyPosition(){
-  if(!myTicket) return;
-  const entries = Object.values(queueData);
-  const myEntry = entries.find(e=>e.ticket===myTicket);
-  if(!myEntry){
-    const histEntry = Object.values(historyData).find(e=>e.ticket===myTicket);
-    if(histEntry){
-      document.getElementById('nowServingAlert').style.display='none';
-      document.getElementById('positionBox').innerHTML=`<div style="font-size:14px;color:var(--success);font-weight:600;">✅ You have been served. Thank you!</div>`;
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    function beep(freq, start, dur) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq;
+      o.type = "sine";
+      g.gain.setValueAtTime(0.4, ctx.currentTime + start);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+      o.start(ctx.currentTime + start);
+      o.stop(ctx.currentTime + start + dur + 0.05);
     }
+    beep(880, 0, 0.15);
+    beep(1100, 0.2, 0.15);
+    beep(880, 0.4, 0.15);
+    beep(1100, 0.6, 0.3);
+  } catch(e) { console.log("Audio not available"); }
+}
+
+// ── INIT ──
+async function init() {
+  // Load settings
+  const settingsSnap = await get(ref(db, "settings"));
+  const settings = settingsSnap.val() || {};
+  if (settings.visitorPin) visitorPin = settings.visitorPin;
+  const isOpen = settings.registrationOpen !== false;
+
+  // Check if visitor has an existing session
+  const savedTicket = localStorage.getItem("qms_ticket");
+  const savedKey = localStorage.getItem("qms_key");
+  const savedName = localStorage.getItem("qms_name");
+
+  if (savedTicket && savedKey) {
+    // Verify ticket still exists in queue
+    const snap = await get(ref(db, "queue/" + savedKey));
+    if (snap.exists()) {
+      myTicketNumber = parseInt(savedTicket);
+      myQueueKey = savedKey;
+      myName = savedName || "";
+      showScreen("screen-ticket");
+      startTicketListeners();
+      return;
+    } else {
+      // Ticket no longer in queue — clear storage
+      clearSession();
+    }
+  }
+
+  // No existing session — check if registration is open
+  if (!isOpen) {
+    showScreen("screen-closed");
     return;
   }
-  if(myEntry.status==='serving'){
-    document.getElementById('nowServingAlert').style.display='block';
-    document.getElementById('positionBox').style.display='none';
-  } else {
-    document.getElementById('nowServingAlert').style.display='none';
-    document.getElementById('positionBox').style.display='block';
-    const waitingEntries = entries.filter(e=>e.status==='waiting');
-    waitingEntries.sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
-    const myIndex = waitingEntries.findIndex(e=>e.ticket===myTicket);
-    document.getElementById('positionValue').textContent = myIndex > 0 ? myIndex : '0';
-  }
-  const serving = entries.find(e=>e.status==='serving');
-  document.getElementById('currentlyServing').textContent = serving ? serving.ticket : '—';
+
+  // Load form questions
+  const fqSnap = await get(ref(db, "formQuestions"));
+  formQuestions = fqSnap.val() ? Object.values(fqSnap.val()) : [];
+  renderForm();
+
+  // Load live queue stats
+  onValue(ref(db, "queue"), snap => {
+    queueData = snap.val() || {};
+    updateStats();
+  });
+
+  showScreen("screen-pin");
 }
 
-window.resetForm = function(){
-  myTicket=null; myEntryId=null;
-  document.getElementById('visitorName').value='';
-  formQuestions.forEach(q=>{ const el=document.getElementById('fq_'+q.id); if(el) el.value=''; });
-  document.getElementById('ticketState').style.display='none';
-  document.getElementById('formState').style.display='block';
-  document.getElementById('nowServingAlert').style.display='none';
-  document.getElementById('positionBox').style.display='block';
-  const btn=document.getElementById('submitBtn');
-  btn.disabled=false; btn.textContent='🎫 Join Queue';
+init();
+
+// ── SCREENS ──
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => { s.style.display = "none"; s.classList.remove("active"); });
+  const el = document.getElementById(id);
+  if (el) { el.style.display = "block"; el.classList.add("active"); }
+}
+
+// ── PIN ──
+window.pinPress = function(val) {
+  if (val === "clear") { pinEntry = ""; }
+  else if (val === "back") { pinEntry = pinEntry.slice(0,-1); }
+  else if (pinEntry.length < 4) { pinEntry += val; }
+  updatePinDots();
+  if (pinEntry.length === 4) {
+    setTimeout(() => {
+      if (pinEntry === visitorPin) {
+        document.getElementById("pin-error").style.display = "none";
+        showScreen("screen-form");
+      } else {
+        document.getElementById("pin-error").style.display = "block";
+        pinEntry = "";
+        updatePinDots();
+      }
+    }, 200);
+  }
 };
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById("dot-" + i);
+    if (dot) dot.classList.toggle("filled", i < pinEntry.length);
+  }
+}
+
+// ── FORM ──
+function renderForm() {
+  const container = document.getElementById("dynamic-form");
+  let html = `
+    <div class="form-group">
+      <label class="form-label">Full Name *</label>
+      <div class="input-icon">
+        <span class="icon">👤</span>
+        <input class="form-input" type="text" id="f-name" placeholder="Enter your full name">
+      </div>
+    </div>`;
+  formQuestions.forEach((q, i) => {
+    html += `<div class="form-group"><label class="form-label">${q.label}${q.required==="true"||q.required===true?" *":""}</label>`;
+    if (q.type === "text") html += `<input class="form-input" type="text" id="fq-${i}" placeholder="${q.label}">`;
+    else if (q.type === "number") html += `<input class="form-input" type="number" id="fq-${i}" placeholder="${q.label}">`;
+    else if (q.type === "yesno") html += `<select class="form-input" id="fq-${i}"><option value="">Select</option><option>Yes</option><option>No</option></select>`;
+    else if (q.type === "dropdown") {
+      const opts = (q.options||"").split(",").map(o=>o.trim());
+      html += `<select class="form-input" id="fq-${i}"><option value="">Select</option>${opts.map(o=>`<option>${o}</option>`).join("")}</select>`;
+    }
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function updateStats() {
+  const entries = Object.values(queueData);
+  const waiting = entries.filter(e => e.status === "waiting" || e.status === "serving").length;
+  document.getElementById("stat-queue").textContent = waiting;
+  document.getElementById("stat-wait").textContent = "~" + (waiting * 5);
+}
+
+// ── SUBMIT ──
+window.submitForm = async function() {
+  const name = document.getElementById("f-name")?.value.trim();
+  if (!name) { alert("Please enter your name."); return; }
+  const formData = {};
+  formQuestions.forEach((q, i) => {
+    const el = document.getElementById("fq-" + i);
+    if (el) formData[q.label] = el.value;
+  });
+  const result = await runTransaction(ref(db, "ticketCounter"), c => (c || 0) + 1);
+  const ticketNumber = result.snapshot.val();
+  const entry = { name, ticketNumber, timestamp: Date.now(), status: "waiting", formData };
+  const newRef = await push(ref(db, "queue"), entry);
+  myTicketNumber = ticketNumber;
+  myQueueKey = newRef.key;
+  myName = name;
+  localStorage.setItem("qms_ticket", ticketNumber);
+  localStorage.setItem("qms_key", newRef.key);
+  localStorage.setItem("qms_name", name);
+  document.getElementById("ticket-num").textContent = "#" + ticketNumber;
+  document.getElementById("ticket-name").textContent = name;
+  showScreen("screen-ticket");
+  startTicketListeners();
+};
+
+// ── TICKET LISTENERS ──
+function startTicketListeners() {
+  document.getElementById("ticket-num").textContent = "#" + myTicketNumber;
+  document.getElementById("ticket-name").textContent = myName;
+
+  // Listen to queue for position updates
+  onValue(ref(db, "queue"), snap => {
+    queueData = snap.val() || {};
+    updateTicketPosition();
+    updateVolumeChart();
+  });
+
+  // Listen for alert/call
+  onValue(ref(db, "alerts/" + myTicketNumber), snap => {
+    if (!snap.exists()) return;
+    const data = snap.val();
+    const calledAt = data?.calledAt || 0;
+    if (calledAt > lastAlertTime) {
+      lastAlertTime = calledAt;
+      showAlertBanner();
+      createAlertSound();
+    }
+  });
+
+  // Check if ticket still in queue (completed)
+  onValue(ref(db, "queue/" + myQueueKey), snap => {
+    if (!snap.exists()) {
+      clearSession();
+      showCompletedMessage();
+    } else {
+      const e = snap.val();
+      updateStatusBox(e.status);
+    }
+  });
+}
+
+function updateTicketPosition() {
+  if (!myTicketNumber) return;
+  const entries = Object.values(queueData).filter(e => e.status === "waiting" || e.status === "serving");
+  entries.sort((a,b) => (a.ticketNumber||0)-(b.ticketNumber||0));
+  const pos = entries.findIndex(e => e.ticketNumber === myTicketNumber);
+  document.getElementById("ticket-position").textContent = pos >= 0 ? pos + 1 : "—";
+}
+
+function updateStatusBox(status) {
+  const box = document.getElementById("ticket-status-box");
+  const map = {
+    waiting: { cls: "status-waiting", text: "⏳ Waiting" },
+    serving: { cls: "status-serving", text: "🪟 Being Served" },
+    called:  { cls: "status-called",  text: "📢 Called — Please proceed!" },
+    completed:{ cls: "status-completed", text: "✅ Completed" }
+  };
+  const s = map[status] || map.waiting;
+  box.className = "status-box " + s.cls;
+  box.textContent = s.text;
+}
+
+function showAlertBanner() {
+  const banner = document.getElementById("alert-banner");
+  banner.style.display = "block";
+  updateStatusBox("called");
+  setTimeout(() => { banner.style.display = "none"; }, 15000);
+}
+
+function showCompletedMessage() {
+  const box = document.getElementById("ticket-status-box");
+  box.className = "status-box status-completed";
+  box.textContent = "✅ Your session is complete. Thank you!";
+  document.getElementById("ticket-position").textContent = "—";
+}
+
+// ── VOLUME CHART ──
+function updateVolumeChart() {
+  const hours = Array(24).fill(0);
+  Object.values(queueData).forEach(e => {
+    const h = new Date(e.timestamp||0).getHours();
+    hours[h]++;
+  });
+  const labels = Array.from({length:24},(_,i)=>i+":00");
+  const canvas = document.getElementById("volume-chart");
+  if (!canvas) return;
+  if (volumeChart) { volumeChart.destroy(); volumeChart = null; }
+  volumeChart = new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "Visitors",
+        data: hours,
+        backgroundColor: "rgba(15,76,129,0.65)",
+        borderColor: "#0F4C81",
+        borderWidth: 1,
+        borderRadius: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } },
+        x: { ticks: { font: { size: 9 }, maxRotation: 45 } }
+      }
+    }
+  });
+}
+
+// ── LEAVE QUEUE ──
+window.leaveQueue = function() {
+  if (!confirm("Are you sure you want to leave the queue?")) return;
+  if (myQueueKey) remove(ref(db, "queue/" + myQueueKey));
+  clearSession();
+  location.reload();
+};
+
+function clearSession() {
+  localStorage.removeItem("qms_ticket");
+  localStorage.removeItem("qms_key");
+  localStorage.removeItem("qms_name");
+  myTicketNumber = null;
+  myQueueKey = null;
+  myName = "";
+}
 
 </script>
 </body>
