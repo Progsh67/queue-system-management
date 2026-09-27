@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queue Registration</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 32px 16px; }
+  .card { background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.12); padding: 36px 32px; width: 100%; max-width: 460px; }
+  .logo { text-align: center; margin-bottom: 24px; }
+  .logo h1 { font-size: 1.5rem; color: #1a73e8; }
+  .logo p { font-size: 0.9rem; color: #888; margin-top: 4px; }
+  label { display: block; margin-bottom: 6px; font-size: 0.88rem; color: #555; font-weight: 500; }
+  input, select { width: 100%; padding: 11px 13px; border: 1px solid #ddd; border-radius: 7px; font-size: 0.95rem; margin-bottom: 16px; outline: none; transition: border 0.2s; }
+  input:focus, select:focus { border-color: #1a73e8; }
+  .btn { width: 100%; background: #1a73e8; color: white; border: none; padding: 13px; border-radius: 7px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: background 0.2s; margin-top: 4px; }
+  .btn:hover { background: #1558b0; }
+  .btn.outline { background: none; border: 2px solid #1a73e8; color: #1a73e8; margin-top: 10px; }
+  .btn.outline:hover { background: #e8f0fe; }
+  .ticket-box { display: none; text-align: center; }
+  .ticket-num { font-size: 5rem; font-weight: 800; color: #1a73e8; line-height: 1; margin: 16px 0; }
+  .ticket-label { font-size: 0.9rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  .ticket-info { background: #f8f9fa; border-radius: 8px; padding: 16px; margin: 20px 0; text-align: left; }
+  .ticket-info p { font-size: 0.88rem; color: #555; margin-bottom: 6px; }
+  .ticket-info p:last-child { margin-bottom: 0; }
+  .ticket-info strong { color: #333; }
+  .status-box { margin-top: 20px; padding: 16px; border-radius: 8px; text-align: center; }
+  .status-box.waiting { background: #fff3cd; border: 1px solid #ffc107; }
+  .status-box.serving { background: #d1e7dd; border: 1px solid #198754; }
+  .status-box.done { background: #e2e3e5; border: 1px solid #adb5bd; }
+  .status-box h3 { font-size: 1rem; margin-bottom: 4px; }
+  .status-box p { font-size: 0.85rem; color: #555; }
+  .position-badge { font-size: 2rem; font-weight: 700; color: #1a73e8; margin: 8px 0; }
+  .divider { border: none; border-top: 1px solid #eee; margin: 20px 0; }
+  .msg { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 0.9rem; }
+  .msg.error { background: #f8d7da; color: #842029; }
+  .refresh-note { font-size: 0.78rem; color: #aaa; text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <h1>🏥 Queue Registration</h1>
+    <p>Register below to receive your queue ticket</p>
+  </div>
+  <div id="form-section">
+    <div id="form-msg"></div>
+    <label>Full Name *</label><input type="text" id="reg-name" placeholder="e.g. John Tan">
+    <label>NRIC / ID (optional)</label><input type="text" id="reg-nric" placeholder="e.g. S1234567A">
+    <label>Service Required *</label>
+    <select id="reg-service"><option value="">-- Select Service --</option><option>General Enquiry</option><option>Document Submission</option><option>Payment</option><option>Medical Consultation</option><option>Other</option></select>
+    <button class="btn" onclick="registerQueue()">🎫 Get My Ticket</button>
+  </div>
+  <div id="ticket-section" class="ticket-box">
+    <div class="ticket-label">Your Queue Number</div>
+    <div class="ticket-num" id="disp-ticket">—</div>
+    <div class="ticket-info">
+      <p>👤 <strong>Name:</strong> <span id="disp-name">—</span></p>
+      <p>🏷️ <strong>Service:</strong> <span id="disp-service">—</span></p>
+      <p>🕐 <strong>Registered at:</strong> <span id="disp-time">—</span></p>
+    </div>
+    <div id="status-section" class="status-box waiting">
+      <h3 id="status-title">⏳ You are in the queue</h3>
+      <div class="position-badge" id="status-position">—</div>
+      <p id="status-desc">Please wait. We will call your number soon.</p>
+    </div>
+    <hr class="divider">
+    <button class="btn outline" onclick="checkStatus()">🔄 Check My Status</button>
+    <p class="refresh-note">Tap the button above to refresh your position in the queue.</p>
+    <hr class="divider">
+    <button class="btn outline" onclick="resetForm()" style="border-color:#dc3545;color:#dc3545;">✕ Cancel & Start Over</button>
+  </div>
+</div>
+<script>
+function getQueue(){return JSON.parse(localStorage.getItem('qms_queue')||'[]');}
+function saveQueue(q){localStorage.setItem('qms_queue',JSON.stringify(q));}
+function getSettings(){return JSON.parse(localStorage.getItem('qms_settings')||JSON.stringify({orgname:'Queue Management System',counters:3,prefix:'A'}));}
+function nextTicketNum(){const q=getQueue();if(!q.length)return 1;return Math.max(...q.map(t=>t.num))+1;}
+function fmtTime(iso){const d=new Date(iso);return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function registerQueue(){const name=document.getElementById('reg-name').value.trim();const nric=document.getElementById('reg-nric').value.trim();const service=document.getElementById('reg-service').value;const msgEl=document.getElementById('form-msg');if(!name){msgEl.innerHTML='<div class="msg error">Please enter your name.</div>';return;}if(!service){msgEl.innerHTML='<div class="msg error">Please select a service type.</div>';return;}const s=getSettings();const num=nextTicketNum();const ticket=s.prefix+String(num).padStart(3,'0');const now=new Date().toISOString();const q=getQueue();q.push({num,ticket,name,nric,service,notes:'',status:'Waiting',counter:null,time:now});saveQueue(q);sessionStorage.setItem('my_ticket',ticket);document.getElementById('disp-ticket').textContent=ticket;document.getElementById('disp-name').textContent=name;document.getElementById('disp-service').textContent=service;document.getElementById('disp-time').textContent=fmtTime(now);document.getElementById('form-section').style.display='none';document.getElementById('ticket-section').style.display='block';checkStatus();}
+function checkStatus(){const myTicket=sessionStorage.getItem('my_ticket');if(!myTicket)return;const q=getQueue();const mine=q.find(t=>t.ticket===myTicket);if(!mine)return;const statusBox=document.getElementById('status-section');const statusTitle=document.getElementById('status-title');const statusPos=document.getElementById('status-position');const statusDesc=document.getElementById('status-desc');statusBox.className='status-box '+mine.status.toLowerCase();if(mine.status==='Waiting'){const waitingBefore=q.filter(t=>t.status==='Waiting'&&t.num<mine.num).length;statusTitle.textContent='⏳ You are in the queue';statusPos.textContent=waitingBefore+1+' in line';statusDesc.textContent=waitingBefore===0?'You are next! Please be ready.':waitingBefore+' person(s) ahead of you. Please wait.';}else if(mine.status==='Serving'){statusTitle.textContent='🔔 It\'s your turn!';statusPos.textContent='Counter '+mine.counter;statusDesc.textContent='Please proceed to Counter '+mine.counter+' now.';}else{statusTitle.textContent='✅ Service Completed';statusPos.textContent='Done';statusDesc.textContent='Thank you for visiting. Have a great day!';}}
+function resetForm(){if(!confirm('Cancel your ticket and start over?'))return;sessionStorage.removeItem('my_ticket');document.getElementById('form-section').style.display='block';document.getElementById('ticket-section').style.display='none';document.getElementById('form-msg').innerHTML='';document.getElementById('reg-name').value='';document.getElementById('reg-nric').value='';document.getElementById('reg-service').value='';}
+</script>
+</body>
+</html>
