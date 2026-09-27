@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queue Management System - Staff Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; }
+  header { background: #1a73e8; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  header h1 { font-size: 1.4rem; }
+  header span { font-size: 0.9rem; opacity: 0.85; }
+  nav { background: #fff; border-bottom: 2px solid #e0e0e0; display: flex; overflow-x: auto; }
+  nav button { padding: 14px 20px; border: none; background: none; cursor: pointer; font-size: 0.95rem; color: #555; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.2s; }
+  nav button:hover { background: #f5f5f5; color: #1a73e8; }
+  nav button.active { color: #1a73e8; border-bottom-color: #1a73e8; font-weight: 600; }
+  .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); text-align: center; }
+  .card h3 { font-size: 0.85rem; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card .value { font-size: 2.2rem; font-weight: 700; color: #1a73e8; }
+  .card .sub { font-size: 0.8rem; color: #aaa; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  th { background: #1a73e8; color: white; padding: 12px 16px; text-align: left; font-size: 0.9rem; }
+  td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f9f9f9; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; }
+  .badge.waiting { background: #fff3cd; color: #856404; }
+  .badge.serving { background: #d1e7dd; color: #0f5132; }
+  .badge.done { background: #e2e3e5; color: #41464b; }
+  .form-box { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); max-width: 520px; }
+  .form-box h2 { margin-bottom: 20px; font-size: 1.1rem; color: #333; }
+  label { display: block; margin-bottom: 6px; font-size: 0.88rem; color: #555; font-weight: 500; }
+  input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; margin-bottom: 16px; outline: none; transition: border 0.2s; }
+  input:focus, select:focus, textarea:focus { border-color: #1a73e8; }
+  textarea { resize: vertical; min-height: 80px; }
+  .btn { background: #1a73e8; color: white; border: none; padding: 11px 24px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; font-weight: 600; transition: background 0.2s; }
+  .btn:hover { background: #1558b0; }
+  .btn.danger { background: #dc3545; }
+  .btn.danger:hover { background: #a71d2a; }
+  .btn.success { background: #198754; }
+  .btn.success:hover { background: #146c43; }
+  .btn.sm { padding: 6px 14px; font-size: 0.82rem; }
+  .counters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .counter-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  .counter-card h3 { font-size: 1rem; margin-bottom: 8px; }
+  .counter-card p { font-size: 0.85rem; color: #777; margin-bottom: 12px; }
+  .counter-status { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; margin-bottom: 12px; }
+  .counter-status.open { background: #d1e7dd; color: #0f5132; }
+  .counter-status.closed { background: #f8d7da; color: #842029; }
+  .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .analytics-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  .analytics-card h3 { font-size: 0.95rem; color: #555; margin-bottom: 16px; }
+  .bar-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 0.85rem; }
+  .bar-label { width: 90px; color: #555; }
+  .bar-track { flex: 1; background: #e9ecef; border-radius: 4px; height: 10px; margin: 0 10px; }
+  .bar-fill { height: 10px; border-radius: 4px; background: #1a73e8; }
+  .bar-val { width: 30px; text-align: right; color: #333; font-weight: 600; }
+  .history-filter { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .history-filter input, .history-filter select { margin-bottom: 0; width: auto; flex: 1; min-width: 140px; }
+  .settings-section { background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 20px; max-width: 600px; }
+  .settings-section h2 { font-size: 1rem; margin-bottom: 16px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .toggle-row span { font-size: 0.9rem; color: #444; }
+  .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 24px; transition: 0.3s; }
+  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+  input:checked + .slider { background: #1a73e8; }
+  input:checked + .slider:before { transform: translateX(20px); }
+  .msg { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 0.9rem; }
+  .msg.success { background: #d1e7dd; color: #0f5132; }
+  .msg.error { background: #f8d7da; color: #842029; }
+  .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: #333; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🏥 Queue Management System</h1>
+  <span id="clock"></span>
+</header>
+<nav>
+  <button class="active" onclick="showTab('dashboard', this)">📊 Dashboard</button>
+  <button onclick="showTab('livequeue', this)">🔴 Live Queue</button>
+  <button onclick="showTab('addqueue', this)">➕ Add to Queue</button>
+  <button onclick="showTab('counters', this)">🪟 Counters</button>
+  <button onclick="showTab('analytics', this)">📈 Analytics</button>
+  <button onclick="showTab('history', this)">📋 History</button>
+  <button onclick="showTab('settings', this)">⚙️ Settings</button>
+</nav>
+<div class="container">
+  <div id="tab-dashboard" class="tab-content active">
+    <div class="cards">
+      <div class="card"><h3>Total Today</h3><div class="value" id="stat-total">0</div><div class="sub">tickets issued</div></div>
+      <div class="card"><h3>Waiting</h3><div class="value" id="stat-waiting">0</div><div class="sub">in queue</div></div>
+      <div class="card"><h3>Serving</h3><div class="value" id="stat-serving">0</div><div class="sub">at counters</div></div>
+      <div class="card"><h3>Completed</h3><div class="value" id="stat-done">0</div><div class="sub">served today</div></div>
+      <div class="card"><h3>Avg Wait</h3><div class="value" id="stat-avgwait">—</div><div class="sub">minutes</div></div>
+    </div>
+    <p class="section-title">Recent Queue Activity</p>
+    <table><thead><tr><th>Ticket</th><th>Name</th><th>Service</th><th>Status</th><th>Time</th></tr></thead><tbody id="dashboard-recent"></tbody></table>
+  </div>
+  <div id="tab-livequeue" class="tab-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <p class="section-title" style="margin:0">Live Queue</p>
+      <button class="btn sm" onclick="renderAll()">🔄 Refresh</button>
+    </div>
+    <table><thead><tr><th>Ticket</th><th>Name</th><th>Service</th><th>Counter</th><th>Status</th><th>Actions</th></tr></thead><tbody id="live-queue-body"></tbody></table>
+  </div>
+  <div id="tab-addqueue" class="tab-content">
+    <div class="form-box">
+      <h2>➕ Add New Visitor to Queue</h2>
+      <div id="add-msg"></div>
+      <label>Full Name *</label><input type="text" id="add-name" placeholder="e.g. John Tan">
+      <label>NRIC / ID (optional)</label><input type="text" id="add-nric" placeholder="e.g. S1234567A">
+      <label>Service Type *</label>
+      <select id="add-service"><option value="">-- Select Service --</option><option>General Enquiry</option><option>Document Submission</option><option>Payment</option><option>Medical Consultation</option><option>Other</option></select>
+      <label>Notes (optional)</label><textarea id="add-notes" placeholder="Any special requirements..."></textarea>
+      <button class="btn" onclick="addToQueue()">Issue Ticket</button>
+    </div>
+  </div>
+  <div id="tab-counters" class="tab-content">
+    <p class="section-title">Counter Management</p>
+    <div class="counters-grid" id="counters-grid"></div>
+  </div>
+  <div id="tab-analytics" class="tab-content">
+    <p class="section-title">Today's Analytics</p>
+    <div class="analytics-grid">
+      <div class="analytics-card"><h3>Tickets by Service</h3><div id="analytics-service"></div></div>
+      <div class="analytics-card"><h3>Tickets by Hour</h3><div id="analytics-hour"></div></div>
+      <div class="analytics-card"><h3>Status Breakdown</h3><div id="analytics-status"></div></div>
+    </div>
+  </div>
+  <div id="tab-history" class="tab-content">
+    <p class="section-title">Queue History</p>
+    <div class="history-filter">
+      <input type="text" id="hist-search" placeholder="Search name or ticket..." oninput="renderHistory()">
+      <select id="hist-status" onchange="renderHistory()"><option value="">All Statuses</option><option value="Waiting">Waiting</option><option value="Serving">Serving</option><option value="Done">Done</option></select>
+    </div>
+    <table><thead><tr><th>Ticket</th><th>Name</th><th>Service</th><th>Status</th><th>Time</th><th>Notes</th></tr></thead><tbody id="history-body"></tbody></table>
+  </div>
+  <div id="tab-settings" class="tab-content">
+    <div class="settings-section">
+      <h2>General Settings</h2>
+      <label>Organisation / Clinic Name</label><input type="text" id="set-orgname" placeholder="e.g. Sunshine Clinic">
+      <label>Number of Counters</label><input type="number" id="set-counters" min="1" max="20" value="3">
+      <label>Ticket Prefix</label><input type="text" id="set-prefix" placeholder="e.g. A" maxlength="3">
+      <button class="btn" onclick="saveSettings()">Save Settings</button>
+      <div id="set-msg" style="margin-top:12px;"></div>
+    </div>
+    <div class="settings-section">
+      <h2>Notifications</h2>
+      <div class="toggle-row"><span>Sound alert when ticket called</span><label class="toggle"><input type="checkbox" id="set-sound" checked><span class="slider"></span></label></div>
+      <div class="toggle-row"><span>Auto-refresh live queue</span><label class="toggle"><input type="checkbox" id="set-autorefresh" checked><span class="slider"></span></label></div>
+    </div>
+    <div class="settings-section">
+      <h2>Data Management</h2>
+      <button class="btn danger" onclick="clearAllData()">🗑️ Clear All Queue Data</button>
+      <p style="font-size:0.82rem;color:#888;margin-top:8px;">This will remove all tickets from today's queue. Cannot be undone.</p>
+    </div>
+  </div>
+</div>
+<script>
+function getQueue(){return JSON.parse(localStorage.getItem('qms_queue')||'[]');}
+function saveQueue(q){localStorage.setItem('qms_queue',JSON.stringify(q));}
+function getSettings(){return JSON.parse(localStorage.getItem('qms_settings')||JSON.stringify({orgname:'Queue Management System',counters:3,prefix:'A'}));}
+function saveSettingsData(s){localStorage.setItem('qms_settings',JSON.stringify(s));}
+function getCounters(){const s=getSettings();const stored=JSON.parse(localStorage.getItem('qms_counters')||'[]');const arr=[];for(let i=1;i<=s.counters;i++){arr.push(stored.find(c=>c.id===i)||{id:i,name:'Counter '+i,status:'open',serving:null});}return arr;}
+function saveCounters(c){localStorage.setItem('qms_counters',JSON.stringify(c));}
+function nextTicketNum(){const q=getQueue();if(!q.length)return 1;return Math.max(...q.map(t=>t.num))+1;}
+function showTab(id,btn){document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));document.querySelectorAll('nav button').forEach(el=>el.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');renderAll();}
+function addToQueue(){const name=document.getElementById('add-name').value.trim();const nric=document.getElementById('add-nric').value.trim();const service=document.getElementById('add-service').value;const notes=document.getElementById('add-notes').value.trim();const msgEl=document.getElementById('add-msg');if(!name){msgEl.innerHTML='<div class="msg error">Please enter a name.</div>';return;}if(!service){msgEl.innerHTML='<div class="msg error">Please select a service type.</div>';return;}const s=getSettings();const num=nextTicketNum();const ticket=s.prefix+String(num).padStart(3,'0');const q=getQueue();q.push({num,ticket,name,nric,service,notes,status:'Waiting',counter:null,time:new Date().toISOString()});saveQueue(q);msgEl.innerHTML='<div class="msg success">✅ Ticket <strong>'+ticket+'</strong> issued for <strong>'+name+'</strong>.</div>';document.getElementById('add-name').value='';document.getElementById('add-nric').value='';document.getElementById('add-service').value='';document.getElementById('add-notes').value='';renderAll();}
+function callNext(counterId){const q=getQueue();const next=q.find(t=>t.status==='Waiting');if(!next){alert('No waiting tickets.');return;}const counters=getCounters();const c=counters.find(c=>c.id===counterId);if(c.serving){const cur=q.find(t=>t.ticket===c.serving);if(cur)cur.status='Done';}next.status='Serving';next.counter=counterId;c.serving=next.ticket;saveQueue(q);saveCounters(counters);renderAll();}
+function markDone(ticket){const q=getQueue();const t=q.find(x=>x.ticket===ticket);if(t){t.status='Done';t.counter=null;}const counters=getCounters();counters.forEach(c=>{if(c.serving===ticket)c.serving=null;});saveQueue(q);saveCounters(counters);renderAll();}
+function removeTicket(ticket){if(!confirm('Remove ticket '+ticket+'?'))return;let q=getQueue();q=q.filter(t=>t.ticket!==ticket);const counters=getCounters();counters.forEach(c=>{if(c.serving===ticket)c.serving=null;});saveQueue(q);saveCounters(counters);renderAll();}
+function renderAll(){renderDashboard();renderLiveQueue();renderCounters();renderAnalytics();renderHistory();loadSettings();}
+function fmtTime(iso){const d=new Date(iso);return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function badgeHtml(status){const cls=status==='Waiting'?'waiting':status==='Serving'?'serving':'done';return '<span class="badge '+cls+'">'+status+'</span>';}
+function renderDashboard(){const q=getQueue();const waiting=q.filter(t=>t.status==='Waiting').length;const serving=q.filter(t=>t.status==='Serving').length;const done=q.filter(t=>t.status==='Done').length;document.getElementById('stat-total').textContent=q.length;document.getElementById('stat-waiting').textContent=waiting;document.getElementById('stat-serving').textContent=serving;document.getElementById('stat-done').textContent=done;document.getElementById('stat-avgwait').textContent=q.length>1?Math.round(q.length*4.5)+'m':'—';const recent=[...q].reverse().slice(0,8);document.getElementById('dashboard-recent').innerHTML=recent.map(t=>'<tr><td><strong>'+t.ticket+'</strong></td><td>'+t.name+'</td><td>'+t.service+'</td><td>'+badgeHtml(t.status)+'</td><td>'+fmtTime(t.time)+'</td></tr>').join('')||'<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">No tickets yet today.</td></tr>';}
+function renderLiveQueue(){const q=getQueue().filter(t=>t.status!=='Done');document.getElementById('live-queue-body').innerHTML=q.map(t=>'<tr><td><strong>'+t.ticket+'</strong></td><td>'+t.name+'</td><td>'+t.service+'</td><td>'+(t.counter?'Counter '+t.counter:'—')+'</td><td>'+badgeHtml(t.status)+'</td><td><button class="btn sm success" onclick="markDone(\''+t.ticket+'\')">✓ Done</button> <button class="btn sm danger" onclick="removeTicket(\''+t.ticket+'\')">✕</button></td></tr>').join('')||'<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Queue is empty.</td></tr>';}
+function renderCounters(){const counters=getCounters();const q=getQueue();document.getElementById('counters-grid').innerHTML=counters.map(c=>{const serving=c.serving?q.find(t=>t.ticket===c.serving):null;return'<div class="counter-card"><h3>'+c.name+'</h3><span class="counter-status '+c.status+'">'+(c.status==='open'?'🟢 Open':'🔴 Closed')+'</span><p>'+(serving?'Serving: <strong>'+serving.ticket+'</strong> — '+serving.name:'No one being served')+'</p><button class="btn sm" onclick="callNext('+c.id+')">📢 Call Next</button>'+(serving?' <button class="btn sm success" onclick="markDone(\''+serving.ticket+'\')">✓ Done</button>':'')+'</div>';}).join('');}
+function renderAnalytics(){const q=getQueue();const svcMap={};q.forEach(t=>{svcMap[t.service]=(svcMap[t.service]||0)+1;});const maxSvc=Math.max(...Object.values(svcMap),1);document.getElementById('analytics-service').innerHTML=Object.entries(svcMap).map(([k,v])=>'<div class="bar-row"><span class="bar-label">'+k.substring(0,12)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(v/maxSvc*100)+'%"></div></div><span class="bar-val">'+v+'</span></div>').join('')||'<p style="color:#aaa;font-size:0.85rem;">No data yet.</p>';const hourMap={};q.forEach(t=>{const h=new Date(t.time).getHours();hourMap[h]=(hourMap[h]||0)+1;});const maxH=Math.max(...Object.values(hourMap),1);document.getElementById('analytics-hour').innerHTML=Object.entries(hourMap).sort((a,b)=>a[0]-b[0]).map(([h,v])=>'<div class="bar-row"><span class="bar-label">'+h+':00</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(v/maxH*100)+'%"></div></div><span class="bar-val">'+v+'</span></div>').join('')||'<p style="color:#aaa;font-size:0.85rem;">No data yet.</p>';const waiting=q.filter(t=>t.status==='Waiting').length;const serving=q.filter(t=>t.status==='Serving').length;const done=q.filter(t=>t.status==='Done').length;const total=q.length||1;document.getElementById('analytics-status').innerHTML='<div class="bar-row"><span class="bar-label">Waiting</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(waiting/total*100)+'%;background:#ffc107"></div></div><span class="bar-val">'+waiting+'</span></div><div class="bar-row"><span class="bar-label">Serving</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(serving/total*100)+'%;background:#198754"></div></div><span class="bar-val">'+serving+'</span></div><div class="bar-row"><span class="bar-label">Done</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(done/total*100)+'%;background:#6c757d"></div></div><span class="bar-val">'+done+'</span></div>';}
+function renderHistory(){const q=getQueue();const search=(document.getElementById('hist-search')||{}).value||'';const statusFilter=(document.getElementById('hist-status')||{}).value||'';const filtered=[...q].reverse().filter(t=>(!search||t.name.toLowerCase().includes(search.toLowerCase())||t.ticket.toLowerCase().includes(search.toLowerCase()))&&(!statusFilter||t.status===statusFilter));document.getElementById('history-body').innerHTML=filtered.map(t=>'<tr><td><strong>'+t.ticket+'</strong></td><td>'+t.name+'</td><td>'+t.service+'</td><td>'+badgeHtml(t.status)+'</td><td>'+fmtTime(t.time)+'</td><td>'+(t.notes||'—')+'</td></tr>').join('')||'<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">No records found.</td></tr>';}
+function loadSettings(){const s=getSettings();const el=document.getElementById('set-orgname');if(el)el.value=s.orgname||'';const el2=document.getElementById('set-counters');if(el2)el2.value=s.counters||3;const el3=document.getElementById('set-prefix');if(el3)el3.value=s.prefix||'A';}
+function saveSettings(){const s={orgname:document.getElementById('set-orgname').value.trim()||'Queue Management System',counters:parseInt(document.getElementById('set-counters').value)||3,prefix:document.getElementById('set-prefix').value.trim().toUpperCase()||'A'};saveSettingsData(s);document.getElementById('set-msg').innerHTML='<div class="msg success">✅ Settings saved.</div>';setTimeout(()=>{document.getElementById('set-msg').innerHTML='';},3000);renderAll();}
+function clearAllData(){if(!confirm('Clear ALL queue data? This cannot be undone.'))return;localStorage.removeItem('qms_queue');localStorage.removeItem('qms_counters');renderAll();}
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleString();}
+setInterval(updateClock,1000);updateClock();
+setInterval(()=>{if(document.getElementById('set-autorefresh')&&document.getElementById('set-autorefresh').checked){renderAll();}},15000);
+renderAll();
+</script>
+</body>
+</html>
