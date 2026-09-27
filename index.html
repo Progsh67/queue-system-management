@@ -1,196 +1,880 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Queue Management System - Staff Dashboard</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; }
-  header { background: #1a73e8; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-  header h1 { font-size: 1.4rem; }
-  header span { font-size: 0.9rem; opacity: 0.85; }
-  nav { background: #fff; border-bottom: 2px solid #e0e0e0; display: flex; overflow-x: auto; }
-  nav button { padding: 14px 20px; border: none; background: none; cursor: pointer; font-size: 0.95rem; color: #555; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.2s; }
-  nav button:hover { background: #f5f5f5; color: #1a73e8; }
-  nav button.active { color: #1a73e8; border-bottom-color: #1a73e8; font-weight: 600; }
-  .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-  .card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); text-align: center; }
-  .card h3 { font-size: 0.85rem; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .card .value { font-size: 2.2rem; font-weight: 700; color: #1a73e8; }
-  .card .sub { font-size: 0.8rem; color: #aaa; margin-top: 4px; }
-  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-  th { background: #1a73e8; color: white; padding: 12px 16px; text-align: left; font-size: 0.9rem; }
-  td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #f9f9f9; }
-  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; }
-  .badge.waiting { background: #fff3cd; color: #856404; }
-  .badge.serving { background: #d1e7dd; color: #0f5132; }
-  .badge.done { background: #e2e3e5; color: #41464b; }
-  .form-box { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); max-width: 520px; }
-  .form-box h2 { margin-bottom: 20px; font-size: 1.1rem; color: #333; }
-  label { display: block; margin-bottom: 6px; font-size: 0.88rem; color: #555; font-weight: 500; }
-  input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; margin-bottom: 16px; outline: none; transition: border 0.2s; }
-  input:focus, select:focus, textarea:focus { border-color: #1a73e8; }
-  textarea { resize: vertical; min-height: 80px; }
-  .btn { background: #1a73e8; color: white; border: none; padding: 11px 24px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; font-weight: 600; transition: background 0.2s; }
-  .btn:hover { background: #1558b0; }
-  .btn.danger { background: #dc3545; }
-  .btn.danger:hover { background: #a71d2a; }
-  .btn.success { background: #198754; }
-  .btn.success:hover { background: #146c43; }
-  .btn.sm { padding: 6px 14px; font-size: 0.82rem; }
-  .counters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-  .counter-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-  .counter-card h3 { font-size: 1rem; margin-bottom: 8px; }
-  .counter-card p { font-size: 0.85rem; color: #777; margin-bottom: 12px; }
-  .counter-status { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; margin-bottom: 12px; }
-  .counter-status.open { background: #d1e7dd; color: #0f5132; }
-  .counter-status.closed { background: #f8d7da; color: #842029; }
-  .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-  .analytics-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-  .analytics-card h3 { font-size: 0.95rem; color: #555; margin-bottom: 16px; }
-  .bar-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 0.85rem; }
-  .bar-label { width: 90px; color: #555; }
-  .bar-track { flex: 1; background: #e9ecef; border-radius: 4px; height: 10px; margin: 0 10px; }
-  .bar-fill { height: 10px; border-radius: 4px; background: #1a73e8; }
-  .bar-val { width: 30px; text-align: right; color: #333; font-weight: 600; }
-  .history-filter { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-  .history-filter input, .history-filter select { margin-bottom: 0; width: auto; flex: 1; min-width: 140px; }
-  .settings-section { background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 20px; max-width: 600px; }
-  .settings-section h2 { font-size: 1rem; margin-bottom: 16px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-  .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .toggle-row span { font-size: 0.9rem; color: #444; }
-  .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 24px; transition: 0.3s; }
-  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
-  input:checked + .slider { background: #1a73e8; }
-  input:checked + .slider:before { transform: translateX(20px); }
-  .msg { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 0.9rem; }
-  .msg.success { background: #d1e7dd; color: #0f5132; }
-  .msg.error { background: #f8d7da; color: #842029; }
-  .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: #333; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Queue Management System — Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #0F4C81;
+      --primary-dark: #0a3560;
+      --primary-light: #1a6bb5;
+      --accent: #00B4D8;
+      --accent-light: #48CAE4;
+      --success: #2ecc71;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --bg: #f0f4f8;
+      --sidebar-bg: #0F4C81;
+      --card-bg: #ffffff;
+      --text-primary: #1a2332;
+      --text-secondary: #5a6a7e;
+      --text-light: #8a9bb0;
+      --border: #e2e8f0;
+      --shadow: 0 2px 12px rgba(15,76,129,0.08);
+      --shadow-lg: 0 8px 32px rgba(15,76,129,0.15);
+      --sidebar-width: 260px;
+      --header-height: 64px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-width); background: var(--sidebar-bg); color: #fff;
+      display: flex; flex-direction: column; position: fixed; top: 0; left: 0;
+      height: 100vh; z-index: 100; transition: transform 0.3s;
+    }
+    .sidebar-logo {
+      padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .sidebar-logo .logo-icon {
+      width: 40px; height: 40px; background: var(--accent); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .sidebar-logo .logo-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; line-height: 1.2; }
+    .sidebar-logo .logo-sub { font-size: 11px; opacity: 0.6; font-weight: 400; }
+    .sidebar-nav { flex: 1; padding: 16px 0; overflow-y: auto; }
+    .nav-section-label {
+      font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+      color: rgba(255,255,255,0.4); padding: 12px 20px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 11px 20px;
+      cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent;
+      font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.75);
+      text-decoration: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; border-left-color: var(--accent); }
+    .nav-item.active { background: rgba(0,180,216,0.15); color: #fff; border-left-color: var(--accent); }
+    .nav-item i { width: 18px; text-align: center; font-size: 15px; }
+    .nav-badge {
+      margin-left: auto; background: var(--accent); color: #fff;
+      font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+    }
+    .sidebar-footer {
+      padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 12px; color: rgba(255,255,255,0.4);
+    }
+
+    /* MAIN */
+    .main { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* HEADER */
+    .header {
+      height: var(--header-height); background: var(--card-bg); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; position: sticky; top: 0; z-index: 50;
+      box-shadow: 0 1px 4px rgba(15,76,129,0.06);
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--primary); }
+    .header-subtitle { font-size: 12px; color: var(--text-secondary); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .live-badge {
+      display: flex; align-items: center; gap: 6px; background: rgba(46,204,113,0.1);
+      color: var(--success); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .live-dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px;
+      border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+      border: none; transition: all 0.2s; font-family: 'Inter', sans-serif;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: var(--shadow); }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-accent:hover { background: var(--accent-light); }
+    .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+    .btn-outline:hover { background: var(--primary); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #c0392b; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    /* CONTENT */
+    .content { flex: 1; padding: 28px; }
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* STAT CARDS */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--card-bg); border-radius: 14px; padding: 22px;
+      box-shadow: var(--shadow); border: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px; transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .stat-icon {
+      width: 52px; height: 52px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .stat-icon.blue { background: rgba(15,76,129,0.1); color: var(--primary); }
+    .stat-icon.cyan { background: rgba(0,180,216,0.1); color: var(--accent); }
+    .stat-icon.green { background: rgba(46,204,113,0.1); color: var(--success); }
+    .stat-icon.orange { background: rgba(243,156,18,0.1); color: var(--warning); }
+    .stat-info { flex: 1; }
+    .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-weight: 500; }
+    .stat-change { font-size: 11px; margin-top: 6px; font-weight: 600; }
+    .stat-change.up { color: var(--success); }
+    .stat-change.down { color: var(--danger); }
+
+    /* CARDS */
+    .card { background: var(--card-bg); border-radius: 14px; box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden; }
+    .card-header {
+      padding: 18px 22px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .card-body { padding: 22px; }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: #f8fafc; color: var(--text-secondary); font-weight: 600;
+      padding: 11px 16px; text-align: left; font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.5px; border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody td { padding: 13px 16px; color: var(--text-primary); vertical-align: middle; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    }
+    .badge-waiting { background: rgba(243,156,18,0.12); color: var(--warning); }
+    .badge-serving { background: rgba(0,180,216,0.12); color: var(--accent); }
+    .badge-done { background: rgba(46,204,113,0.12); color: var(--success); }
+    .badge-cancelled { background: rgba(231,76,60,0.12); color: var(--danger); }
+
+    /* QUEUE NUMBER */
+    .queue-num {
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px;
+      color: var(--primary); background: rgba(15,76,129,0.08); padding: 4px 10px; border-radius: 6px;
+    }
+
+    /* GRID LAYOUTS */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+    /* COUNTER CARDS */
+    .counter-card {
+      background: var(--card-bg); border-radius: 14px; padding: 22px;
+      box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center;
+    }
+    .counter-num {
+      font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 700;
+      color: var(--primary); line-height: 1;
+    }
+    .counter-label { font-size: 13px; color: var(--text-secondary); margin-top: 6px; font-weight: 500; }
+    .counter-serving {
+      margin-top: 12px; padding: 8px 14px; background: rgba(0,180,216,0.08);
+      border-radius: 8px; font-size: 13px; color: var(--accent); font-weight: 600;
+    }
+    .counter-status { margin-top: 10px; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(10,30,60,0.5);
+      z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(2px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card-bg); border-radius: 16px; padding: 32px;
+      width: 100%; max-width: 480px; box-shadow: var(--shadow-lg);
+      animation: modalIn 0.25s ease;
+    }
+    @keyframes modalIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+    .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--primary); }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-control {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif;
+      color: var(--text-primary); transition: border-color 0.2s; outline: none;
+    }
+    .form-control:focus { border-color: var(--accent); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+    /* TOAST */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 10px; }
+    .toast {
+      background: var(--text-primary); color: #fff; padding: 13px 20px;
+      border-radius: 10px; font-size: 13px; font-weight: 500;
+      box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px;
+      animation: toastIn 0.3s ease; min-width: 260px;
+    }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    .toast.info { background: var(--accent); }
+    @keyframes toastIn { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+
+    /* ANALYTICS */
+    .chart-container { position: relative; height: 220px; display: flex; align-items: flex-end; gap: 8px; padding: 10px 0; }
+    .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+    .chart-bar { width: 100%; background: linear-gradient(180deg, var(--accent) 0%, var(--primary) 100%); border-radius: 6px 6px 0 0; transition: height 0.6s ease; min-height: 4px; }
+    .chart-label { font-size: 10px; color: var(--text-secondary); font-weight: 500; }
+    .chart-val { font-size: 10px; color: var(--text-primary); font-weight: 700; }
+
+    /* SEARCH */
+    .search-bar {
+      display: flex; align-items: center; gap: 10px; background: var(--bg);
+      border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 14px;
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .search-bar input { border: none; background: transparent; outline: none; font-size: 13px; color: var(--text-primary); width: 200px; }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--text-secondary); }
+    .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
+    .empty-state p { font-size: 14px; }
+
+    /* SETTINGS */
+    .settings-section { margin-bottom: 28px; }
+    .settings-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-label { font-size: 14px; font-weight: 500; }
+    .settings-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .toggle { position: relative; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; background: var(--border); border-radius: 24px;
+      cursor: pointer; transition: 0.3s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute; width: 18px; height: 18px; background: #fff;
+      border-radius: 50%; top: 3px; left: 3px; transition: 0.3s;
+    }
+    .toggle input:checked + .toggle-slider { background: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* RESPONSIVE */
+    @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main { margin-left: 0; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-<header>
-  <h1>🏥 Queue Management System</h1>
-  <span id="clock"></span>
-</header>
-<nav>
-  <button class="active" onclick="showTab('dashboard', this)">📊 Dashboard</button>
-  <button onclick="showTab('livequeue', this)">🔴 Live Queue</button>
-  <button onclick="showTab('addqueue', this)">➕ Add to Queue</button>
-  <button onclick="showTab('counters', this)">🪟 Counters</button>
-  <button onclick="showTab('analytics', this)">📈 Analytics</button>
-  <button onclick="showTab('history', this)">📋 History</button>
-  <button onclick="showTab('settings', this)">⚙️ Settings</button>
-</nav>
-<div class="container">
-  <div id="tab-dashboard" class="tab-content active">
-    <div class="cards">
-      <div class="card"><h3>Total Today</h3><div class="value" id="stat-total">0</div><div class="sub">tickets issued</div></div>
-      <div class="card"><h3>Waiting</h3><div class="value" id="stat-waiting">0</div><div class="sub">in queue</div></div>
-      <div class="card"><h3>Serving</h3><div class="value" id="stat-serving">0</div><div class="sub">at counters</div></div>
-      <div class="card"><h3>Completed</h3><div class="value" id="stat-done">0</div><div class="sub">served today</div></div>
-      <div class="card"><h3>Avg Wait</h3><div class="value" id="stat-avgwait">—</div><div class="sub">minutes</div></div>
-    </div>
-    <p class="section-title">Recent Queue Activity</p>
-    <table><thead><tr><th>Ticket</th><th>Name</th><th>Service</th><th>Status</th><th>Time</th></tr></thead><tbody id="dashboard-recent"></tbody></table>
-  </div>
-  <div id="tab-livequeue" class="tab-content">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <p class="section-title" style="margin:0">Live Queue</p>
-      <button class="btn sm" onclick="renderAll()">🔄 Refresh</button>
-    </div>
-    <table><thead><tr><th>Ticket</th><th>Name</th><th>Service</th><th>Counter</th><th>Status</th><th>Actions</th></tr></thead><tbody id="live-queue-body"></tbody></table>
-  </div>
-  <div id="tab-addqueue" class="tab-content">
-    <div class="form-box">
-      <h2>➕ Add New Visitor to Queue</h2>
-      <div id="add-msg"></div>
-      <label>Full Name *</label><input type="text" id="add-name" placeholder="e.g. John Tan">
-      <label>NRIC / ID (optional)</label><input type="text" id="add-nric" placeholder="e.g. S1234567A">
-      <label>Service Type *</label>
-      <select id="add-service"><option value="">-- Select Service --</option><option>General Enquiry</option><option>Document Submission</option><option>Payment</option><option>Medical Consultation</option><option>Other</option></select>
-      <label>Notes (optional)</label><textarea id="add-notes" placeholder="Any special requirements..."></textarea>
-      <button class="btn" onclick="addToQueue()">Issue Ticket</button>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="fas fa-layer-group"></i></div>
+    <div>
+      <div class="logo-text">QueueSys</div>
+      <div class="logo-sub">Admin Dashboard</div>
     </div>
   </div>
-  <div id="tab-counters" class="tab-content">
-    <p class="section-title">Counter Management</p>
-    <div class="counters-grid" id="counters-grid"></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item active" onclick="showPage('dashboard',this)"><i class="fas fa-th-large"></i> Dashboard</a>
+    <a class="nav-item" onclick="showPage('livequeue',this)"><i class="fas fa-list-ol"></i> Live Queue <span class="nav-badge" id="nav-waiting-count">0</span></a>
+    <a class="nav-item" onclick="showPage('counters',this)"><i class="fas fa-desktop"></i> Counters</a>
+    <div class="nav-section-label">Actions</div>
+    <a class="nav-item" onclick="openAddModal()"><i class="fas fa-user-plus"></i> Add to Queue</a>
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" onclick="showPage('analytics',this)"><i class="fas fa-chart-bar"></i> Analytics</a>
+    <a class="nav-item" onclick="showPage('history',this)"><i class="fas fa-history"></i> History</a>
+    <div class="nav-section-label">System</div>
+    <a class="nav-item" onclick="showPage('settings',this)"><i class="fas fa-cog"></i> Settings</a>
+  </nav>
+  <div class="sidebar-footer">Queue Management System v2.0</div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div>
+        <div class="header-title" id="page-title">Dashboard</div>
+        <div class="header-subtitle" id="page-subtitle">Overview of today's queue activity</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-badge"><div class="live-dot"></div> Live</div>
+      <button class="btn btn-primary" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Visitor</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page-section active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Total Today</div>
+            <div class="stat-change up" id="stat-total-change">—</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon cyan"><i class="fas fa-hourglass-half"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-waiting">0</div>
+            <div class="stat-label">Waiting</div>
+            <div class="stat-change" id="stat-waiting-change">—</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-served">0</div>
+            <div class="stat-label">Served</div>
+            <div class="stat-change up" id="stat-served-change">—</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-avgwait">—</div>
+            <div class="stat-label">Avg Wait (min)</div>
+            <div class="stat-change" id="stat-avg-change">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-list-ol" style="color:var(--accent);margin-right:8px;"></i>Live Queue</span>
+            <button class="btn btn-sm btn-outline" onclick="showPage('livequeue',null)">View All</button>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Name</th><th>Service</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="dashboard-queue-tbody">
+                  <tr><td colspan="5"><div class="empty-state"><i class="fas fa-inbox"></i><p>No visitors yet</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-chart-line" style="color:var(--accent);margin-right:8px;"></i>Today's Flow</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" id="mini-chart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE QUEUE PAGE -->
+    <div class="page-section" id="page-livequeue">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" id="queue-search" placeholder="Search by name or ticket..." oninput="renderQueue()"/>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-accent" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Visitor</button>
+          <button class="btn btn-outline btn-sm" onclick="clearAllQueue()"><i class="fas fa-trash"></i> Clear All</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Ticket</th><th>Name</th><th>IC / Ref</th><th>Service</th><th>Counter</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+              <tbody id="queue-tbody">
+                <tr><td colspan="8"><div class="empty-state"><i class="fas fa-inbox"></i><p>No visitors in queue</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COUNTERS PAGE -->
+    <div class="page-section" id="page-counters">
+      <div style="margin-bottom:20px;display:flex;justify-content:flex-end;">
+        <button class="btn btn-primary" onclick="callNext()"><i class="fas fa-arrow-right"></i> Call Next</button>
+      </div>
+      <div class="grid-3" id="counters-grid"></div>
+    </div>
+
+    <!-- ANALYTICS PAGE -->
+    <div class="page-section" id="page-analytics">
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Visitors by Hour</span></div>
+          <div class="card-body">
+            <div class="chart-container" id="hourly-chart" style="height:200px;"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Service Breakdown</span></div>
+          <div class="card-body" id="service-breakdown">
+            <div class="empty-state"><i class="fas fa-chart-pie"></i><p>No data yet</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Summary Statistics</span></div>
+        <div class="card-body">
+          <div class="stats-grid" style="margin-bottom:0;">
+            <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-info"><div class="stat-value" id="a-total">0</div><div class="stat-label">Total Registered</div></div></div>
+            <div class="stat-card"><div class="stat-icon green"><i class="fas fa-check"></i></div><div class="stat-info"><div class="stat-value" id="a-served">0</div><div class="stat-label">Served</div></div></div>
+            <div class="stat-card"><div class="stat-icon cyan"><i class="fas fa-hourglass"></i></div><div class="stat-info"><div class="stat-value" id="a-waiting">0</div><div class="stat-label">Waiting</div></div></div>
+            <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-clock"></i></div><div class="stat-info"><div class="stat-value" id="a-avg">—</div><div class="stat-label">Avg Wait (min)</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY PAGE -->
+    <div class="page-section" id="page-history">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" id="history-search" placeholder="Search history..." oninput="renderHistory()"/>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="clearHistory()"><i class="fas fa-trash"></i> Clear History</button>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Ticket</th><th>Name</th><th>IC / Ref</th><th>Service</th><th>Status</th><th>Date/Time</th></tr></thead>
+              <tbody id="history-tbody">
+                <tr><td colspan="6"><div class="empty-state"><i class="fas fa-history"></i><p>No history yet</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page-section" id="page-settings">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">General Settings</span></div>
+          <div class="card-body">
+            <div class="settings-section">
+              <div class="settings-row">
+                <div><div class="settings-label">Organisation Name</div><div class="settings-desc">Shown on registration page</div></div>
+                <input class="form-control" style="width:180px;" id="org-name" value="Government Agency"/>
+              </div>
+              <div class="settings-row">
+                <div><div class="settings-label">Number of Counters</div><div class="settings-desc">Active service counters</div></div>
+                <input class="form-control" style="width:80px;" type="number" id="num-counters" value="3" min="1" max="10"/>
+              </div>
+              <div class="settings-row">
+                <div><div class="settings-label">Auto-call Next</div><div class="settings-desc">Automatically call next visitor</div></div>
+                <label class="toggle"><input type="checkbox" id="auto-call"/><span class="toggle-slider"></span></label>
+              </div>
+              <div class="settings-row">
+                <div><div class="settings-label">Sound Notifications</div><div class="settings-desc">Play sound on new registration</div></div>
+                <label class="toggle"><input type="checkbox" id="sound-notif" checked/><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Save Settings</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Services</span></div>
+          <div class="card-body">
+            <div id="services-list" style="margin-bottom:16px;"></div>
+            <div style="display:flex;gap:8px;">
+              <input class="form-control" id="new-service" placeholder="Add new service..." style="flex:1;"/>
+              <button class="btn btn-accent" onclick="addService()"><i class="fas fa-plus"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
-  <div id="tab-analytics" class="tab-content">
-    <p class="section-title">Today's Analytics</p>
-    <div class="analytics-grid">
-      <div class="analytics-card"><h3>Tickets by Service</h3><div id="analytics-service"></div></div>
-      <div class="analytics-card"><h3>Tickets by Hour</h3><div id="analytics-hour"></div></div>
-      <div class="analytics-card"><h3>Status Breakdown</h3><div id="analytics-status"></div></div>
+</div>
+
+<!-- ADD VISITOR MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-title"><i class="fas fa-user-plus" style="color:var(--accent);margin-right:8px;"></i>Add Visitor to Queue</div>
+    <div class="form-group">
+      <label class="form-label">Full Name *</label>
+      <input class="form-control" id="m-name" placeholder="Enter full name"/>
     </div>
-  </div>
-  <div id="tab-history" class="tab-content">
-    <p class="section-title">Queue History</p>
-    <div class="history-filter">
-      <input type="text" id="hist-search" placeholder="Search name or ticket..." oninput="renderHistory()">
-      <select id="hist-status" onchange="renderHistory()"><option value="">All Statuses</option><option value="Waiting">Waiting</option><option value="Serving">Serving</option><option value="Done">Done</option></select>
+    <div class="form-group">
+      <label class="form-label">IC / Reference No.</label>
+      <input class="form-control" id="m-ic" placeholder="e.g. S1234567A"/>
     </div>
-    <table><thead><tr><th>Ticket</th><th>Name</th><th>Service</th><th>Status</th><th>Time</th><th>Notes</th></tr></thead><tbody id="history-body"></tbody></table>
-  </div>
-  <div id="tab-settings" class="tab-content">
-    <div class="settings-section">
-      <h2>General Settings</h2>
-      <label>Organisation / Clinic Name</label><input type="text" id="set-orgname" placeholder="e.g. Sunshine Clinic">
-      <label>Number of Counters</label><input type="number" id="set-counters" min="1" max="20" value="3">
-      <label>Ticket Prefix</label><input type="text" id="set-prefix" placeholder="e.g. A" maxlength="3">
-      <button class="btn" onclick="saveSettings()">Save Settings</button>
-      <div id="set-msg" style="margin-top:12px;"></div>
+    <div class="form-group">
+      <label class="form-label">Phone Number</label>
+      <input class="form-control" id="m-phone" placeholder="e.g. 91234567"/>
     </div>
-    <div class="settings-section">
-      <h2>Notifications</h2>
-      <div class="toggle-row"><span>Sound alert when ticket called</span><label class="toggle"><input type="checkbox" id="set-sound" checked><span class="slider"></span></label></div>
-      <div class="toggle-row"><span>Auto-refresh live queue</span><label class="toggle"><input type="checkbox" id="set-autorefresh" checked><span class="slider"></span></label></div>
+    <div class="form-group">
+      <label class="form-label">Service Required *</label>
+      <select class="form-control" id="m-service"></select>
     </div>
-    <div class="settings-section">
-      <h2>Data Management</h2>
-      <button class="btn danger" onclick="clearAllData()">🗑️ Clear All Queue Data</button>
-      <p style="font-size:0.82rem;color:#888;margin-top:8px;">This will remove all tickets from today's queue. Cannot be undone.</p>
+    <div class="form-group">
+      <label class="form-label">Remarks</label>
+      <input class="form-control" id="m-remarks" placeholder="Optional remarks"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addVisitor()"><i class="fas fa-plus"></i> Add to Queue</button>
     </div>
   </div>
 </div>
-<script>
-function getQueue(){return JSON.parse(localStorage.getItem('qms_queue')||'[]');}
-function saveQueue(q){localStorage.setItem('qms_queue',JSON.stringify(q));}
-function getSettings(){return JSON.parse(localStorage.getItem('qms_settings')||JSON.stringify({orgname:'Queue Management System',counters:3,prefix:'A'}));}
-function saveSettingsData(s){localStorage.setItem('qms_settings',JSON.stringify(s));}
-function getCounters(){const s=getSettings();const stored=JSON.parse(localStorage.getItem('qms_counters')||'[]');const arr=[];for(let i=1;i<=s.counters;i++){arr.push(stored.find(c=>c.id===i)||{id:i,name:'Counter '+i,status:'open',serving:null});}return arr;}
-function saveCounters(c){localStorage.setItem('qms_counters',JSON.stringify(c));}
-function nextTicketNum(){const q=getQueue();if(!q.length)return 1;return Math.max(...q.map(t=>t.num))+1;}
-function showTab(id,btn){document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));document.querySelectorAll('nav button').forEach(el=>el.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');renderAll();}
-function addToQueue(){const name=document.getElementById('add-name').value.trim();const nric=document.getElementById('add-nric').value.trim();const service=document.getElementById('add-service').value;const notes=document.getElementById('add-notes').value.trim();const msgEl=document.getElementById('add-msg');if(!name){msgEl.innerHTML='<div class="msg error">Please enter a name.</div>';return;}if(!service){msgEl.innerHTML='<div class="msg error">Please select a service type.</div>';return;}const s=getSettings();const num=nextTicketNum();const ticket=s.prefix+String(num).padStart(3,'0');const q=getQueue();q.push({num,ticket,name,nric,service,notes,status:'Waiting',counter:null,time:new Date().toISOString()});saveQueue(q);msgEl.innerHTML='<div class="msg success">✅ Ticket <strong>'+ticket+'</strong> issued for <strong>'+name+'</strong>.</div>';document.getElementById('add-name').value='';document.getElementById('add-nric').value='';document.getElementById('add-service').value='';document.getElementById('add-notes').value='';renderAll();}
-function callNext(counterId){const q=getQueue();const next=q.find(t=>t.status==='Waiting');if(!next){alert('No waiting tickets.');return;}const counters=getCounters();const c=counters.find(c=>c.id===counterId);if(c.serving){const cur=q.find(t=>t.ticket===c.serving);if(cur)cur.status='Done';}next.status='Serving';next.counter=counterId;c.serving=next.ticket;saveQueue(q);saveCounters(counters);renderAll();}
-function markDone(ticket){const q=getQueue();const t=q.find(x=>x.ticket===ticket);if(t){t.status='Done';t.counter=null;}const counters=getCounters();counters.forEach(c=>{if(c.serving===ticket)c.serving=null;});saveQueue(q);saveCounters(counters);renderAll();}
-function removeTicket(ticket){if(!confirm('Remove ticket '+ticket+'?'))return;let q=getQueue();q=q.filter(t=>t.ticket!==ticket);const counters=getCounters();counters.forEach(c=>{if(c.serving===ticket)c.serving=null;});saveQueue(q);saveCounters(counters);renderAll();}
-function renderAll(){renderDashboard();renderLiveQueue();renderCounters();renderAnalytics();renderHistory();loadSettings();}
-function fmtTime(iso){const d=new Date(iso);return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
-function badgeHtml(status){const cls=status==='Waiting'?'waiting':status==='Serving'?'serving':'done';return '<span class="badge '+cls+'">'+status+'</span>';}
-function renderDashboard(){const q=getQueue();const waiting=q.filter(t=>t.status==='Waiting').length;const serving=q.filter(t=>t.status==='Serving').length;const done=q.filter(t=>t.status==='Done').length;document.getElementById('stat-total').textContent=q.length;document.getElementById('stat-waiting').textContent=waiting;document.getElementById('stat-serving').textContent=serving;document.getElementById('stat-done').textContent=done;document.getElementById('stat-avgwait').textContent=q.length>1?Math.round(q.length*4.5)+'m':'—';const recent=[...q].reverse().slice(0,8);document.getElementById('dashboard-recent').innerHTML=recent.map(t=>'<tr><td><strong>'+t.ticket+'</strong></td><td>'+t.name+'</td><td>'+t.service+'</td><td>'+badgeHtml(t.status)+'</td><td>'+fmtTime(t.time)+'</td></tr>').join('')||'<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px;">No tickets yet today.</td></tr>';}
-function renderLiveQueue(){const q=getQueue().filter(t=>t.status!=='Done');document.getElementById('live-queue-body').innerHTML=q.map(t=>'<tr><td><strong>'+t.ticket+'</strong></td><td>'+t.name+'</td><td>'+t.service+'</td><td>'+(t.counter?'Counter '+t.counter:'—')+'</td><td>'+badgeHtml(t.status)+'</td><td><button class="btn sm success" onclick="markDone(\''+t.ticket+'\')">✓ Done</button> <button class="btn sm danger" onclick="removeTicket(\''+t.ticket+'\')">✕</button></td></tr>').join('')||'<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">Queue is empty.</td></tr>';}
-function renderCounters(){const counters=getCounters();const q=getQueue();document.getElementById('counters-grid').innerHTML=counters.map(c=>{const serving=c.serving?q.find(t=>t.ticket===c.serving):null;return'<div class="counter-card"><h3>'+c.name+'</h3><span class="counter-status '+c.status+'">'+(c.status==='open'?'🟢 Open':'🔴 Closed')+'</span><p>'+(serving?'Serving: <strong>'+serving.ticket+'</strong> — '+serving.name:'No one being served')+'</p><button class="btn sm" onclick="callNext('+c.id+')">📢 Call Next</button>'+(serving?' <button class="btn sm success" onclick="markDone(\''+serving.ticket+'\')">✓ Done</button>':'')+'</div>';}).join('');}
-function renderAnalytics(){const q=getQueue();const svcMap={};q.forEach(t=>{svcMap[t.service]=(svcMap[t.service]||0)+1;});const maxSvc=Math.max(...Object.values(svcMap),1);document.getElementById('analytics-service').innerHTML=Object.entries(svcMap).map(([k,v])=>'<div class="bar-row"><span class="bar-label">'+k.substring(0,12)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(v/maxSvc*100)+'%"></div></div><span class="bar-val">'+v+'</span></div>').join('')||'<p style="color:#aaa;font-size:0.85rem;">No data yet.</p>';const hourMap={};q.forEach(t=>{const h=new Date(t.time).getHours();hourMap[h]=(hourMap[h]||0)+1;});const maxH=Math.max(...Object.values(hourMap),1);document.getElementById('analytics-hour').innerHTML=Object.entries(hourMap).sort((a,b)=>a[0]-b[0]).map(([h,v])=>'<div class="bar-row"><span class="bar-label">'+h+':00</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(v/maxH*100)+'%"></div></div><span class="bar-val">'+v+'</span></div>').join('')||'<p style="color:#aaa;font-size:0.85rem;">No data yet.</p>';const waiting=q.filter(t=>t.status==='Waiting').length;const serving=q.filter(t=>t.status==='Serving').length;const done=q.filter(t=>t.status==='Done').length;const total=q.length||1;document.getElementById('analytics-status').innerHTML='<div class="bar-row"><span class="bar-label">Waiting</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(waiting/total*100)+'%;background:#ffc107"></div></div><span class="bar-val">'+waiting+'</span></div><div class="bar-row"><span class="bar-label">Serving</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(serving/total*100)+'%;background:#198754"></div></div><span class="bar-val">'+serving+'</span></div><div class="bar-row"><span class="bar-label">Done</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(done/total*100)+'%;background:#6c757d"></div></div><span class="bar-val">'+done+'</span></div>';}
-function renderHistory(){const q=getQueue();const search=(document.getElementById('hist-search')||{}).value||'';const statusFilter=(document.getElementById('hist-status')||{}).value||'';const filtered=[...q].reverse().filter(t=>(!search||t.name.toLowerCase().includes(search.toLowerCase())||t.ticket.toLowerCase().includes(search.toLowerCase()))&&(!statusFilter||t.status===statusFilter));document.getElementById('history-body').innerHTML=filtered.map(t=>'<tr><td><strong>'+t.ticket+'</strong></td><td>'+t.name+'</td><td>'+t.service+'</td><td>'+badgeHtml(t.status)+'</td><td>'+fmtTime(t.time)+'</td><td>'+(t.notes||'—')+'</td></tr>').join('')||'<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px;">No records found.</td></tr>';}
-function loadSettings(){const s=getSettings();const el=document.getElementById('set-orgname');if(el)el.value=s.orgname||'';const el2=document.getElementById('set-counters');if(el2)el2.value=s.counters||3;const el3=document.getElementById('set-prefix');if(el3)el3.value=s.prefix||'A';}
-function saveSettings(){const s={orgname:document.getElementById('set-orgname').value.trim()||'Queue Management System',counters:parseInt(document.getElementById('set-counters').value)||3,prefix:document.getElementById('set-prefix').value.trim().toUpperCase()||'A'};saveSettingsData(s);document.getElementById('set-msg').innerHTML='<div class="msg success">✅ Settings saved.</div>';setTimeout(()=>{document.getElementById('set-msg').innerHTML='';},3000);renderAll();}
-function clearAllData(){if(!confirm('Clear ALL queue data? This cannot be undone.'))return;localStorage.removeItem('qms_queue');localStorage.removeItem('qms_counters');renderAll();}
-function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleString();}
-setInterval(updateClock,1000);updateClock();
-setInterval(()=>{if(document.getElementById('set-autorefresh')&&document.getElementById('set-autorefresh').checked){renderAll();}},15000);
-renderAll();
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  // =============================================
+  // PASTE YOUR FIREBASE CONFIG HERE
+  // =============================================
+  const firebaseConfig = {
+  apiKey: "AIzaSyDLBoDG92_PIsCY5wyf4lDEdDJrkKtg2YA",
+  authDomain: "queue-management-system-4a943.firebaseapp.com",
+  databaseURL: "https://queue-management-system-4a943-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "queue-management-system-4a943",
+  storageBucket: "queue-management-system-4a943.firebasestorage.app",
+  messagingSenderId: "339444348789",
+  appId: "1:339444348789:web:e325425ef7333dc9c7053c",
+  measurementId: "G-W8EP43RHY0"
+};
+  // =============================================
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const queueRef = ref(db, 'queue');
+  const historyRef = ref(db, 'history');
+  const settingsRef = ref(db, 'settings');
+
+  let queueData = {};
+  let historyData = {};
+  let services = ['General Enquiry', 'Document Submission', 'Payment', 'Appointment'];
+  let numCounters = 3;
+  let counters = {};
+
+  function initCounters(n) {
+    for (let i = 1; i <= n; i++) {
+      if (!counters[i]) counters[i] = { serving: null, status: 'available' };
+    }
+    renderCounters();
+  }
+
+  window.showPage = function(page, el) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    if (el) el.classList.add('active');
+    const titles = {
+      dashboard: ['Dashboard', "Overview of today's queue activity"],
+      livequeue: ['Live Queue', 'Manage and monitor all visitors'],
+      counters: ['Counters', 'Service counter management'],
+      analytics: ['Analytics', 'Queue performance insights'],
+      history: ['History', 'Past visitor records'],
+      settings: ['Settings', 'System configuration']
+    };
+    if (titles[page]) {
+      document.getElementById('page-title').textContent = titles[page][0];
+      document.getElementById('page-subtitle').textContent = titles[page][1];
+    }
+    if (page === 'analytics') renderAnalytics();
+    if (page === 'history') renderHistory();
+  };
+
+  window.showToast = function(msg, type='info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    const icons = { success: 'check-circle', error: 'exclamation-circle', info: 'info-circle' };
+    t.innerHTML = '<i class="fas fa-' + (icons[type]||'info-circle') + '"></i> ' + msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  };
+
+  window.openAddModal = function() {
+    populateServiceSelect('m-service');
+    document.getElementById('add-modal').classList.add('open');
+  };
+  window.closeAddModal = function() {
+    document.getElementById('add-modal').classList.remove('open');
+    ['m-name','m-ic','m-phone','m-remarks'].forEach(id => document.getElementById(id).value = '');
+  };
+
+  function populateServiceSelect(id) {
+    const sel = document.getElementById(id);
+    sel.innerHTML = services.map(s => '<option>' + s + '</option>').join('');
+  }
+
+  window.addVisitor = function() {
+    const name = document.getElementById('m-name').value.trim();
+    const service = document.getElementById('m-service').value;
+    if (!name) { showToast('Please enter visitor name', 'error'); return; }
+    const ticket = 'Q' + String(Object.keys(queueData).length + Object.keys(historyData).length + 1).padStart(3, '0');
+    push(queueRef, {
+      name, ic: document.getElementById('m-ic').value.trim(),
+      phone: document.getElementById('m-phone').value.trim(),
+      service, remarks: document.getElementById('m-remarks').value.trim(),
+      ticket, status: 'waiting', counter: '',
+      timestamp: Date.now(), joinedAt: new Date().toLocaleTimeString()
+    });
+    closeAddModal();
+    showToast('Visitor added — Ticket ' + ticket, 'success');
+  };
+
+  window.renderQueue = function() {
+    const search = (document.getElementById('queue-search')||{value:''}).value.toLowerCase();
+    const rows = Object.entries(queueData)
+      .filter(([,v]) => v.name.toLowerCase().includes(search) || (v.ticket||'Q').toLowerCase().includes(search))
+      .sort((a,b) => a[1].timestamp - b[1].timestamp);
+
+    const tbody = document.getElementById('queue-tbody');
+    const dtbody = document.getElementById('dashboard-queue-tbody');
+
+    if (!rows.length) {
+      const empty = '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-inbox"></i><p>No visitors in queue</p></div></td></tr>';
+      tbody.innerHTML = empty;
+      dtbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fas fa-inbox"></i><p>No visitors yet</p></div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(([key, v]) => `
+      <tr>
+        <td><span class="queue-num">${v.ticket||'—'}</span></td>
+        <td><strong>${v.name}</strong></td>
+        <td>${v.ic||'—'}</td>
+        <td>${v.service}</td>
+        <td>${v.counter||'—'}</td>
+        <td><span class="badge badge-${v.status}">${v.status}</span></td>
+        <td>${v.joinedAt||'—'}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${v.status==='waiting'?`<button class="btn btn-sm btn-accent" onclick="serveVisitor('${key}')"><i class="fas fa-play"></i> Serve</button>`:''}
+          ${v.status==='serving'?`<button class="btn btn-sm btn-primary" onclick="doneVisitor('${key}')"><i class="fas fa-check"></i> Done</button>`:''}
+          <button class="btn btn-sm btn-danger" onclick="removeVisitor('${key}')"><i class="fas fa-times"></i></button>
+        </td>
+      </tr>`).join('');
+
+    dtbody.innerHTML = rows.slice(0,5).map(([key, v]) => `
+      <tr>
+        <td><span class="queue-num">${v.ticket||'—'}</span></td>
+        <td>${v.name}</td>
+        <td>${v.service}</td>
+        <td><span class="badge badge-${v.status}">${v.status}</span></td>
+        <td>
+          ${v.status==='waiting'?`<button class="btn btn-sm btn-accent" onclick="serveVisitor('${key}')">Serve</button>`:''}
+          ${v.status==='serving'?`<button class="btn btn-sm btn-primary" onclick="doneVisitor('${key}')">Done</button>`:''}
+        </td>
+      </tr>`).join('');
+  };
+
+  window.serveVisitor = function(key) {
+    update(ref(db, 'queue/' + key), { status: 'serving', counter: 'Counter 1' });
+    showToast('Now serving visitor', 'info');
+  };
+
+  window.doneVisitor = function(key) {
+    const v = queueData[key];
+    if (!v) return;
+    push(historyRef, { ...v, status: 'done', completedAt: new Date().toLocaleTimeString(), completedTs: Date.now() });
+    remove(ref(db, 'queue/' + key));
+    showToast('Visitor served — ' + v.name, 'success');
+  };
+
+  window.removeVisitor = function(key) {
+    const v = queueData[key];
+    if (!v) return;
+    push(historyRef, { ...v, status: 'cancelled', completedAt: new Date().toLocaleTimeString(), completedTs: Date.now() });
+    remove(ref(db, 'queue/' + key));
+    showToast('Visitor removed', 'error');
+  };
+
+  window.clearAllQueue = function() {
+    if (!confirm('Clear all visitors from queue?')) return;
+    Object.entries(queueData).forEach(([key, v]) => {
+      push(historyRef, { ...v, status: 'cancelled', completedAt: new Date().toLocaleTimeString(), completedTs: Date.now() });
+      remove(ref(db, 'queue/' + key));
+    });
+    showToast('Queue cleared', 'info');
+  };
+
+  window.callNext = function() {
+    const next = Object.entries(queueData).filter(([,v]) => v.status==='waiting').sort((a,b)=>a[1].timestamp-b[1].timestamp)[0];
+    if (!next) { showToast('No visitors waiting', 'info'); return; }
+    update(ref(db, 'queue/' + next[0]), { status: 'serving', counter: 'Counter 1' });
+    showToast('Calling ' + next[1].name, 'info');
+  };
+
+  function renderCounters() {
+    const grid = document.getElementById('counters-grid');
+    grid.innerHTML = '';
+    for (let i = 1; i <= numCounters; i++) {
+      const serving = Object.values(queueData).find(v => v.status==='serving' && v.counter==='Counter '+i);
+      grid.innerHTML += `
+        <div class="counter-card">
+          <div class="counter-num">${i}</div>
+          <div class="counter-label">Counter ${i}</div>
+          <div class="counter-serving">${serving ? 'Now Serving: ' + serving.name : 'Available'}</div>
+          <div class="counter-status">
+            <span class="badge ${serving?'badge-serving':'badge-done'}">${serving?'Busy':'Free'}</span>
+          </div>
+        </div>`;
+    }
+  }
+
+  window.renderAnalytics = function() {
+    const all = [...Object.values(queueData), ...Object.values(historyData)];
+    document.getElementById('a-total').textContent = all.length;
+    document.getElementById('a-served').textContent = all.filter(v=>v.status==='done').length;
+    document.getElementById('a-waiting').textContent = Object.values(queueData).filter(v=>v.status==='waiting').length;
+
+    const hours = {};
+    all.forEach(v => { if (v.timestamp) { const h = new Date(v.timestamp).getHours(); hours[h]=(hours[h]||0)+1; } });
+    const maxH = Math.max(...Object.values(hours), 1);
+    const chart = document.getElementById('hourly-chart');
+    chart.innerHTML = Array.from({length:12}, (_,i)=>i+8).map(h => {
+      const count = hours[h]||0;
+      const pct = Math.round((count/maxH)*100);
+      return `<div class="chart-bar-wrap">
+        <div class="chart-val">${count||''}</div>
+        <div class="chart-bar" style="height:${pct}%"></div>
+        <div class="chart-label">${h}:00</div>
+      </div>`;
+    }).join('');
+
+    const svcCount = {};
+    all.forEach(v => { svcCount[v.service] = (svcCount[v.service]||0) + 1; });
+    const sb = document.getElementById('service-breakdown');
+    if (!Object.keys(svcCount).length) { sb.innerHTML = '<div class="empty-state"><i class="fas fa-chart-pie"></i><p>No data yet</p></div>'; return; }
+    sb.innerHTML = Object.entries(svcCount).map(([s,c]) => `
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+          <span>${s}</span><strong>${c}</strong>
+        </div>
+        <div style="background:var(--border);border-radius:4px;height:8px;">
+          <div style="background:var(--accent);height:8px;border-radius:4px;width:${Math.round(c/all.length*100)}%"></div>
+        </div>
+      </div>`).join('');
+  };
+
+  window.renderHistory = function() {
+    const search = (document.getElementById('history-search')||{value:''}).value.toLowerCase();
+    const rows = Object.values(historyData)
+      .filter(v => v.name.toLowerCase().includes(search) || (v.ticket||'Q').toLowerCase().includes(search))
+      .sort((a,b) => (b.completedTs||0) - (a.completedTs||0));
+    const tbody = document.getElementById('history-tbody');
+    if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-history"></i><p>No history yet</p></div></td></tr>'; return; }
+    tbody.innerHTML = rows.map(v => `
+      <tr>
+        <td><span class="queue-num">${v.ticket||'—'}</span></td>
+        <td>${v.name}</td>
+        <td>${v.ic||'—'}</td>
+        <td>${v.service}</td>
+        <td><span class="badge badge-${v.status}">${v.status}</span></td>
+        <td>${v.completedAt||'—'}</td>
+      </tr>`).join('');
+  };
+
+  window.clearHistory = function() {
+    if (!confirm('Clear all history?')) return;
+    set(historyRef, null);
+    showToast('History cleared', 'info');
+  };
+
+  function updateStats() {
+    const q = Object.values(queueData);
+    const h = Object.values(historyData);
+    const total = q.length + h.length;
+    const waiting = q.filter(v=>v.status==='waiting').length;
+    const served = h.filter(v=>v.status==='done').length;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-waiting').textContent = waiting;
+    document.getElementById('stat-served').textContent = served;
+    document.getElementById('nav-waiting-count').textContent = waiting;
+    renderCounters();
+    renderQueue();
+    renderMiniChart();
+  }
+
+  function renderMiniChart() {
+    const all = [...Object.values(queueData), ...Object.values(historyData)];
+    const hours = {};
+    all.forEach(v => { if (v.timestamp) { const h = new Date(v.timestamp).getHours(); hours[h]=(hours[h]||0)+1; } });
+    const maxH = Math.max(...Object.values(hours), 1);
+    const chart = document.getElementById('mini-chart');
+    if (!chart) return;
+    chart.innerHTML = Array.from({length:8}, (_,i)=>i+8).map(h => {
+      const count = hours[h]||0;
+      const pct = Math.round((count/maxH)*100);
+      return `<div class="chart-bar-wrap">
+        <div class="chart-val">${count||''}</div>
+        <div class="chart-bar" style="height:${pct||4}%"></div>
+        <div class="chart-label">${h}</div>
+      </div>`;
+    }).join('');
+  }
+
+  window.saveSettings = function() {
+    numCounters = parseInt(document.getElementById('num-counters').value)||3;
+    initCounters(numCounters);
+    showToast('Settings saved', 'success');
+  };
+
+  function renderServices() {
+    const list = document.getElementById('services-list');
+    if (!list) return;
+    list.innerHTML = services.map((s,i) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:14px;">${s}</span>
+        <button class="btn btn-sm btn-danger" onclick="removeService(${i})"><i class="fas fa-times"></i></button>
+      </div>`).join('');
+  }
+  window.addService = function() {
+    const inp = document.getElementById('new-service');
+    const val = inp.value.trim();
+    if (!val) return;
+    services.push(val); inp.value = ''; renderServices();
+    showToast('Service added', 'success');
+  };
+  window.removeService = function(i) { services.splice(i,1); renderServices(); };
+
+  onValue(queueRef, snap => {
+    queueData = snap.val() || {};
+    updateStats();
+  });
+  onValue(historyRef, snap => {
+    historyData = snap.val() || {};
+    updateStats();
+  });
+
+  initCounters(numCounters);
+  renderServices();
 </script>
 </body>
 </html>
