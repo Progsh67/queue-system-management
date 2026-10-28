@@ -833,7 +833,7 @@ function updateCounterSelect() {
 // ── ADMIN ADD TO QUEUE ──
 function renderAdminForm() {
   const container = document.getElementById("admin-form-fields");
-  let html = `<label class="form-label">Full Name *</label><input type="text" id="af-name" placeholder="Visitor name" style="width:100%;padding:0.7rem;border:1.5px solid var(--border);border-radius:8px;margin-bottom:1rem;font-size:0.9rem;outline:none;">`;
+  let html = `<label class="form-label">First Name *</label><input type="text" id="af-name" placeholder="Visitor name" style="width:100%;padding:0.7rem;border:1.5px solid var(--border);border-radius:8px;margin-bottom:1rem;font-size:0.9rem;outline:none;">`;
   formQuestions.forEach((q, i) => {
     html += `<label class="form-label">${q.label}${q.required==="true"||q.required===true?" *":""}</label>`;
     if (q.type === "text") html += `<input type="text" id="af-q${i}" style="width:100%;padding:0.7rem;border:1.5px solid var(--border);border-radius:8px;margin-bottom:1rem;font-size:0.9rem;outline:none;">`;
