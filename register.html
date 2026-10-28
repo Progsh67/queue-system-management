@@ -1,86 +1,380 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Queue Registration</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 32px 16px; }
-  .card { background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.12); padding: 36px 32px; width: 100%; max-width: 460px; }
-  .logo { text-align: center; margin-bottom: 24px; }
-  .logo h1 { font-size: 1.5rem; color: #1a73e8; }
-  .logo p { font-size: 0.9rem; color: #888; margin-top: 4px; }
-  label { display: block; margin-bottom: 6px; font-size: 0.88rem; color: #555; font-weight: 500; }
-  input, select { width: 100%; padding: 11px 13px; border: 1px solid #ddd; border-radius: 7px; font-size: 0.95rem; margin-bottom: 16px; outline: none; transition: border 0.2s; }
-  input:focus, select:focus { border-color: #1a73e8; }
-  .btn { width: 100%; background: #1a73e8; color: white; border: none; padding: 13px; border-radius: 7px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: background 0.2s; margin-top: 4px; }
-  .btn:hover { background: #1558b0; }
-  .btn.outline { background: none; border: 2px solid #1a73e8; color: #1a73e8; margin-top: 10px; }
-  .btn.outline:hover { background: #e8f0fe; }
-  .ticket-box { display: none; text-align: center; }
-  .ticket-num { font-size: 5rem; font-weight: 800; color: #1a73e8; line-height: 1; margin: 16px 0; }
-  .ticket-label { font-size: 0.9rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-  .ticket-info { background: #f8f9fa; border-radius: 8px; padding: 16px; margin: 20px 0; text-align: left; }
-  .ticket-info p { font-size: 0.88rem; color: #555; margin-bottom: 6px; }
-  .ticket-info p:last-child { margin-bottom: 0; }
-  .ticket-info strong { color: #333; }
-  .status-box { margin-top: 20px; padding: 16px; border-radius: 8px; text-align: center; }
-  .status-box.waiting { background: #fff3cd; border: 1px solid #ffc107; }
-  .status-box.serving { background: #d1e7dd; border: 1px solid #198754; }
-  .status-box.done { background: #e2e3e5; border: 1px solid #adb5bd; }
-  .status-box h3 { font-size: 1rem; margin-bottom: 4px; }
-  .status-box p { font-size: 0.85rem; color: #555; }
-  .position-badge { font-size: 2rem; font-weight: 700; color: #1a73e8; margin: 8px 0; }
-  .divider { border: none; border-top: 1px solid #eee; margin: 20px 0; }
-  .msg { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 0.9rem; }
-  .msg.error { background: #f8d7da; color: #842029; }
-  .refresh-note { font-size: 0.78rem; color: #aaa; text-align: center; margin-top: 8px; }
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --primary:#0F4C81;--primary-dark:#0a3560;--accent:#00B4D8;
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
+  --text:#1a2332;--text-muted:#6b7a8d;--border:#e2e8f0;
+}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,#0F4C81 0%,#00B4D8 100%);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+
+/* PIN SCREEN */
+#pinScreen{width:100%;max-width:400px;}
+.pin-card{
+  background:#fff;border-radius:20px;padding:40px 32px;text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,0.25);
+}
+.pin-logo{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--primary);margin-bottom:6px;}
+.pin-sub{color:var(--text-muted);font-size:14px;margin-bottom:28px;}
+.pin-input{
+  width:100%;text-align:center;font-size:28px;letter-spacing:10px;font-weight:700;
+  padding:14px;border:2px solid var(--border);border-radius:12px;
+  font-family:'Space Grotesk',sans-serif;outline:none;margin-bottom:16px;
+  transition:border-color .2s;
+}
+.pin-input:focus{border-color:var(--primary);}
+.pin-btn{
+  width:100%;padding:14px;background:var(--primary);color:#fff;border:none;
+  border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:background .2s;
+}
+.pin-btn:hover{background:var(--primary-dark);}
+.pin-error{color:var(--danger);font-size:13px;margin-top:10px;display:none;}
+
+/* MAIN CARD */
+#mainCard{display:none;width:100%;max-width:520px;}
+.card{
+  background:#fff;border-radius:20px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,0.25);
+}
+.card-header{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  padding:28px 32px;color:#fff;
+}
+.card-header-title{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;}
+.card-header-sub{font-size:13px;opacity:.85;margin-top:4px;}
+.queue-stats{
+  display:flex;gap:0;border-bottom:1px solid var(--border);
+}
+.queue-stat{
+  flex:1;padding:16px;text-align:center;border-right:1px solid var(--border);
+}
+.queue-stat:last-child{border-right:none;}
+.queue-stat-value{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:var(--primary);}
+.queue-stat-label{font-size:11px;color:var(--text-muted);font-weight:500;margin-top:2px;}
+.card-body{padding:28px 32px;}
+
+/* FORM */
+.form-group{margin-bottom:18px;}
+.form-label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text);}
+.form-label .req{color:var(--danger);}
+.form-control{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;
+  font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;
+  color:var(--text);
+}
+.form-control:focus{border-color:var(--primary);}
+.input-icon-wrap{position:relative;}
+.input-icon-wrap .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;}
+.input-icon-wrap .form-control{padding-left:40px;}
+.submit-btn{
+  width:100%;padding:15px;background:var(--primary);color:#fff;border:none;
+  border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;
+  transition:background .2s;font-family:'Inter',sans-serif;margin-top:8px;
+}
+.submit-btn:hover{background:var(--primary-dark);}
+.submit-btn:disabled{background:#94a3b8;cursor:not-allowed;}
+
+/* TICKET / SUCCESS STATE */
+#ticketState{display:none;padding:32px;text-align:center;}
+.ticket-icon{font-size:56px;margin-bottom:16px;}
+.ticket-number{
+  font-family:'Space Grotesk',sans-serif;font-size:72px;font-weight:700;
+  color:var(--primary);line-height:1;margin-bottom:8px;
+}
+.ticket-label{font-size:14px;color:var(--text-muted);margin-bottom:24px;}
+.position-box{
+  background:linear-gradient(135deg,#f0f9ff,#e0f2fe);
+  border:1.5px solid #bae6fd;border-radius:14px;padding:20px;margin-bottom:20px;
+}
+.position-value{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:700;color:var(--accent);}
+.position-label{font-size:13px;color:var(--text-muted);margin-top:4px;}
+.serving-box{
+  background:linear-gradient(135deg,#f0fdf4,#dcfce7);
+  border:1.5px solid #86efac;border-radius:14px;padding:16px;margin-bottom:20px;
+}
+.serving-value{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:var(--success);}
+.serving-label{font-size:13px;color:var(--text-muted);margin-top:2px;}
+.now-serving-alert{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;border-radius:14px;padding:20px;margin-bottom:20px;
+  animation:pulse 1.5s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.85;}}
+.now-serving-text{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;}
+.register-another{
+  background:transparent;border:1.5px solid var(--border);color:var(--text);
+  padding:11px 24px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;
+  font-family:'Inter',sans-serif;transition:all .2s;margin-top:8px;
+}
+.register-another:hover{border-color:var(--primary);color:var(--primary);}
+
+.footer-note{text-align:center;color:rgba(255,255,255,0.7);font-size:12px;margin-top:16px;}
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="logo">
-    <h1>🏥 Queue Registration</h1>
-    <p>Register below to receive your queue ticket</p>
-  </div>
-  <div id="form-section">
-    <div id="form-msg"></div>
-    <label>Full Name *</label><input type="text" id="reg-name" placeholder="e.g. John Tan">
-    <label>NRIC / ID (optional)</label><input type="text" id="reg-nric" placeholder="e.g. S1234567A">
-    <label>Service Required *</label>
-    <select id="reg-service"><option value="">-- Select Service --</option><option>General Enquiry</option><option>Document Submission</option><option>Payment</option><option>Medical Consultation</option><option>Other</option></select>
-    <button class="btn" onclick="registerQueue()">🎫 Get My Ticket</button>
-  </div>
-  <div id="ticket-section" class="ticket-box">
-    <div class="ticket-label">Your Queue Number</div>
-    <div class="ticket-num" id="disp-ticket">—</div>
-    <div class="ticket-info">
-      <p>👤 <strong>Name:</strong> <span id="disp-name">—</span></p>
-      <p>🏷️ <strong>Service:</strong> <span id="disp-service">—</span></p>
-      <p>🕐 <strong>Registered at:</strong> <span id="disp-time">—</span></p>
-    </div>
-    <div id="status-section" class="status-box waiting">
-      <h3 id="status-title">⏳ You are in the queue</h3>
-      <div class="position-badge" id="status-position">—</div>
-      <p id="status-desc">Please wait. We will call your number soon.</p>
-    </div>
-    <hr class="divider">
-    <button class="btn outline" onclick="checkStatus()">🔄 Check My Status</button>
-    <p class="refresh-note">Tap the button above to refresh your position in the queue.</p>
-    <hr class="divider">
-    <button class="btn outline" onclick="resetForm()" style="border-color:#dc3545;color:#dc3545;">✕ Cancel & Start Over</button>
+
+<!-- PIN SCREEN -->
+<div id="pinScreen">
+  <div class="pin-card">
+    <div class="pin-logo">🎫 Queue Registration</div>
+    <div class="pin-sub">Please enter the access PIN to continue</div>
+    <input type="password" class="pin-input" id="pinInput" maxlength="10" placeholder="••••" onkeydown="if(event.key==='Enter')checkPin()"/>
+    <button class="pin-btn" onclick="checkPin()">Enter</button>
+    <div class="pin-error" id="pinError">❌ Incorrect PIN. Please try again.</div>
   </div>
 </div>
-<script>
-function getQueue(){return JSON.parse(localStorage.getItem('qms_queue')||'[]');}
-function saveQueue(q){localStorage.setItem('qms_queue',JSON.stringify(q));}
-function getSettings(){return JSON.parse(localStorage.getItem('qms_settings')||JSON.stringify({orgname:'Queue Management System',counters:3,prefix:'A'}));}
-function nextTicketNum(){const q=getQueue();if(!q.length)return 1;return Math.max(...q.map(t=>t.num))+1;}
-function fmtTime(iso){const d=new Date(iso);return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
-function registerQueue(){const name=document.getElementById('reg-name').value.trim();const nric=document.getElementById('reg-nric').value.trim();const service=document.getElementById('reg-service').value;const msgEl=document.getElementById('form-msg');if(!name){msgEl.innerHTML='<div class="msg error">Please enter your name.</div>';return;}if(!service){msgEl.innerHTML='<div class="msg error">Please select a service type.</div>';return;}const s=getSettings();const num=nextTicketNum();const ticket=s.prefix+String(num).padStart(3,'0');const now=new Date().toISOString();const q=getQueue();q.push({num,ticket,name,nric,service,notes:'',status:'Waiting',counter:null,time:now});saveQueue(q);sessionStorage.setItem('my_ticket',ticket);document.getElementById('disp-ticket').textContent=ticket;document.getElementById('disp-name').textContent=name;document.getElementById('disp-service').textContent=service;document.getElementById('disp-time').textContent=fmtTime(now);document.getElementById('form-section').style.display='none';document.getElementById('ticket-section').style.display='block';checkStatus();}
-function checkStatus(){const myTicket=sessionStorage.getItem('my_ticket');if(!myTicket)return;const q=getQueue();const mine=q.find(t=>t.ticket===myTicket);if(!mine)return;const statusBox=document.getElementById('status-section');const statusTitle=document.getElementById('status-title');const statusPos=document.getElementById('status-position');const statusDesc=document.getElementById('status-desc');statusBox.className='status-box '+mine.status.toLowerCase();if(mine.status==='Waiting'){const waitingBefore=q.filter(t=>t.status==='Waiting'&&t.num<mine.num).length;statusTitle.textContent='⏳ You are in the queue';statusPos.textContent=waitingBefore+1+' in line';statusDesc.textContent=waitingBefore===0?'You are next! Please be ready.':waitingBefore+' person(s) ahead of you. Please wait.';}else if(mine.status==='Serving'){statusTitle.textContent='🔔 It\'s your turn!';statusPos.textContent='Counter '+mine.counter;statusDesc.textContent='Please proceed to Counter '+mine.counter+' now.';}else{statusTitle.textContent='✅ Service Completed';statusPos.textContent='Done';statusDesc.textContent='Thank you for visiting. Have a great day!';}}
-function resetForm(){if(!confirm('Cancel your ticket and start over?'))return;sessionStorage.removeItem('my_ticket');document.getElementById('form-section').style.display='block';document.getElementById('ticket-section').style.display='none';document.getElementById('form-msg').innerHTML='';document.getElementById('reg-name').value='';document.getElementById('reg-nric').value='';document.getElementById('reg-service').value='';}
+
+<!-- MAIN REGISTRATION CARD -->
+<div id="mainCard">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-title" id="orgTitle">🏛️ Queue Registration</div>
+      <div class="card-header-sub">Please fill in your details to join the queue</div>
+    </div>
+    <div class="queue-stats">
+      <div class="queue-stat">
+        <div class="queue-stat-value" id="statWaiting">0</div>
+        <div class="queue-stat-label">Waiting</div>
+      </div>
+      <div class="queue-stat">
+        <div class="queue-stat-value" id="statServing">—</div>
+        <div class="queue-stat-label">Now Serving</div>
+      </div>
+      <div class="queue-stat">
+        <div class="queue-stat-value" id="statDone">0</div>
+        <div class="queue-stat-label">Served Today</div>
+      </div>
+    </div>
+
+    <!-- FORM STATE -->
+    <div class="card-body" id="formState">
+      <div class="form-group">
+        <label class="form-label">Full Name <span class="req">*</span></label>
+        <div class="input-icon-wrap">
+          <span class="icon">👤</span>
+          <input type="text" class="form-control" id="visitorName" placeholder="Enter your full name"/>
+        </div>
+      </div>
+      <div id="dynamicFormFields"></div>
+      <button class="submit-btn" id="submitBtn" onclick="submitRegistration()">🎫 Join Queue</button>
+    </div>
+
+    <!-- TICKET STATE -->
+    <div id="ticketState">
+      <div class="ticket-icon">🎫</div>
+      <div class="ticket-number" id="ticketNumber">A001</div>
+      <div class="ticket-label">Your Queue Ticket</div>
+
+      <div id="nowServingAlert" class="now-serving-alert" style="display:none;">
+        <div class="now-serving-text">🔔 It's Your Turn!</div>
+        <div style="font-size:13px;opacity:.9;margin-top:4px;">Please proceed to the counter now.</div>
+      </div>
+
+      <div class="position-box" id="positionBox">
+        <div class="position-value" id="positionValue">—</div>
+        <div class="position-label">People ahead of you</div>
+      </div>
+
+      <div class="serving-box">
+        <div class="serving-value" id="currentlyServing">—</div>
+        <div class="serving-label">Currently being served</div>
+      </div>
+
+      <button class="register-another" onclick="resetForm()">+ Register Another Person</button>
+    </div>
+  </div>
+  <div class="footer-note">Your position updates automatically in real-time</div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDLBoDG92_PIsCY5wyf4lDEdDJrkKtg2YA",
+  authDomain: "queue-management-system-4a943.firebaseapp.com",
+  databaseURL: "https://queue-management-system-4a943-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "queue-management-system-4a943",
+  storageBucket: "queue-management-system-4a943.firebasestorage.app",
+  messagingSenderId: "339444348789",
+  appId: "1:339444348789:web:e325425ef7333dc9c7053c",
+  measurementId: "G-W8EP43RHY0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let settings = { visitorPin:'1234', orgName:'', queuePrefix:'A' };
+let formQuestions = [];
+let queueData = {};
+let historyData = {};
+let myTicket = null;
+let myEntryId = null;
+
+get(ref(db,'settings')).then(snap=>{
+  if(snap.exists()){
+    const s = snap.val();
+    settings = {...settings,...s};
+    if(s.orgName) document.getElementById('orgTitle').textContent = '🏛️ '+s.orgName;
+  }
+});
+
+onValue(ref(db,'queue'), snap=>{
+  queueData = snap.exists() ? snap.val() : {};
+  updateStats();
+  if(myTicket) updateMyPosition();
+});
+
+onValue(ref(db,'history'), snap=>{
+  historyData = snap.exists() ? snap.val() : {};
+  updateStats();
+});
+
+onValue(ref(db,'formQuestions'), snap=>{
+  formQuestions = snap.exists() ? Object.entries(snap.val()).map(([id,v])=>({id,...v})) : [];
+  renderDynamicForm();
+});
+
+onValue(ref(db,'settings'), snap=>{
+  if(snap.exists()){
+    const s = snap.val();
+    settings = {...settings,...s};
+    if(s.orgName) document.getElementById('orgTitle').textContent = '🏛️ '+s.orgName;
+  }
+});
+
+function isToday(ts){
+  if(!ts) return false;
+  const d=new Date(ts),n=new Date();
+  return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();
+}
+
+function updateStats(){
+  const entries = Object.values(queueData);
+  const waiting = entries.filter(e=>e.status==='waiting').length;
+  const serving = entries.find(e=>e.status==='serving');
+  const doneToday = Object.values(historyData).filter(e=>e.status==='done'&&isToday(e.timestamp)).length;
+  document.getElementById('statWaiting').textContent = waiting;
+  document.getElementById('statServing').textContent = serving ? serving.ticket : '—';
+  document.getElementById('statDone').textContent = doneToday;
+}
+
+window.checkPin = function(){
+  const entered = document.getElementById('pinInput').value;
+  if(entered === settings.visitorPin){
+    document.getElementById('pinScreen').style.display='none';
+    document.getElementById('mainCard').style.display='block';
+  } else {
+    document.getElementById('pinError').style.display='block';
+    document.getElementById('pinInput').value='';
+  }
+};
+
+function renderDynamicForm(){
+  const container = document.getElementById('dynamicFormFields');
+  if(!formQuestions.length){ container.innerHTML=''; return; }
+  container.innerHTML = formQuestions.map(q=>{
+    const req = q.required==='true'||q.required===true;
+    let input = '';
+    if(q.type==='text') input=`<input type="text" class="form-control" id="fq_${q.id}" placeholder="Enter your answer"/>`;
+    else if(q.type==='number') input=`<input type="number" class="form-control" id="fq_${q.id}" placeholder="Enter number"/>`;
+    else if(q.type==='yesno') input=`<select class="form-control" id="fq_${q.id}"><option value="">Select</option><option>Yes</option><option>No</option></select>`;
+    else if(q.type==='dropdown'){
+      const opts = (q.options||'').split('\n').filter(Boolean);
+      input=`<select class="form-control" id="fq_${q.id}"><option value="">Select an option</option>${opts.map(o=>`<option>${o}</option>`).join('')}</select>`;
+    }
+    return `<div class="form-group">
+      <label class="form-label">${q.text}${req?'<span class="req"> *</span>':''}</label>
+      ${input}
+    </div>`;
+  }).join('');
+}
+
+window.submitRegistration = async function(){
+  const name = document.getElementById('visitorName').value.trim();
+  if(!name){ alert('Please enter your first name.'); return; }
+  for(const q of formQuestions){
+    const req = q.required==='true'||q.required===true;
+    if(req){
+      const val = document.getElementById('fq_'+q.id)?.value||'';
+      if(!val){ alert('Please answer: '+q.text); return; }
+    }
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='Joining queue...';
+  try {
+    const snap = await get(ref(db,'ticketCounter'));
+    const count = (snap.exists()?snap.val():0)+1;
+    await set(ref(db,'ticketCounter'),count);
+    const prefix = settings.queuePrefix||'A';
+    const ticket = prefix+String(count).padStart(3,'0');
+    const answers = {};
+    formQuestions.forEach(q=>{ answers[q.id]=document.getElementById('fq_'+q.id)?.value||''; });
+    const newRef = push(ref(db,'queue'));
+    await set(newRef,{name,ticket,status:'waiting',timestamp:Date.now(),answers});
+    myTicket = ticket;
+    myEntryId = newRef.key;
+    document.getElementById('formState').style.display='none';
+    document.getElementById('ticketState').style.display='block';
+    document.getElementById('ticketNumber').textContent = ticket;
+    updateMyPosition();
+  } catch(err){
+    alert('Error joining queue. Please try again.');
+    btn.disabled=false; btn.textContent='🎫 Join Queue';
+  }
+};
+
+function updateMyPosition(){
+  if(!myTicket) return;
+  const entries = Object.values(queueData);
+  const myEntry = entries.find(e=>e.ticket===myTicket);
+  if(!myEntry){
+    const histEntry = Object.values(historyData).find(e=>e.ticket===myTicket);
+    if(histEntry){
+      document.getElementById('nowServingAlert').style.display='none';
+      document.getElementById('positionBox').innerHTML=`<div style="font-size:14px;color:var(--success);font-weight:600;">✅ You have been served. Thank you!</div>`;
+    }
+    return;
+  }
+  if(myEntry.status==='serving'){
+    document.getElementById('nowServingAlert').style.display='block';
+    document.getElementById('positionBox').style.display='none';
+  } else {
+    document.getElementById('nowServingAlert').style.display='none';
+    document.getElementById('positionBox').style.display='block';
+    const waitingEntries = entries.filter(e=>e.status==='waiting');
+    waitingEntries.sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
+    const myIndex = waitingEntries.findIndex(e=>e.ticket===myTicket);
+    document.getElementById('positionValue').textContent = myIndex > 0 ? myIndex : '0';
+  }
+  const serving = entries.find(e=>e.status==='serving');
+  document.getElementById('currentlyServing').textContent = serving ? serving.ticket : '—';
+}
+
+window.resetForm = function(){
+  myTicket=null; myEntryId=null;
+  document.getElementById('visitorName').value='';
+  formQuestions.forEach(q=>{ const el=document.getElementById('fq_'+q.id); if(el) el.value=''; });
+  document.getElementById('ticketState').style.display='none';
+  document.getElementById('formState').style.display='block';
+  document.getElementById('nowServingAlert').style.display='none';
+  document.getElementById('positionBox').style.display='block';
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=false; btn.textContent='🎫 Join Queue';
+};
+
 </script>
 </body>
 </html>
